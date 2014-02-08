@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Security.AccessControl;
 using System.Windows.Media.Imaging;
+using DALC;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -132,7 +133,7 @@ namespace MVVMPhotoApp.ViewModel
                     ?? (_saveImageCommand = new RelayCommand(
                                           () =>
                                           {
-                                              new ImageModel(Image, null, Name).AddImage.Execute(null);
+                                              FNHHelper.CreateImage(Image, null, Name);
                                               Messenger.Default.Send<NotificationMessage<bool>>(new NotificationMessage<bool>(true, MessengerMessage.CLOSE_ADD_PHOTO_FORM));
                                           },
                                           () => !string.IsNullOrEmpty(Name) && (_imageBytes!=null && _imageBytes.Length!=0)));

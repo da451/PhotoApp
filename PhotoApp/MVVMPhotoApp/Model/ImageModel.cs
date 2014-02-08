@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using DALC;
 using DALC.Entities;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -19,7 +20,6 @@ namespace MVVMPhotoApp.Model
         /// </summary>
         public ImageModel()
         {
-            AddImage = new RelayCommand(AddImageExecute);
         }
 
         public ImageModel(int imageID, byte[] img, byte[] thumbnail, string name): this()
@@ -134,17 +134,6 @@ namespace MVVMPhotoApp.Model
                 RaisePropertyChanged(NamePropertyName);
             }
         }
-        public virtual ICommand AddImage
-        {
-            get;
-            set;
-        }
-
-        public virtual void AddImageExecute()
-        {
-            DALC.FNHHelper.CreateImage(Img, null, Name);
-        }
-
 
         public static explicit operator Image(ImageModel image)
         {

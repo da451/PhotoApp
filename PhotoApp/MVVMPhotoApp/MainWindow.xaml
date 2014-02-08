@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
         <Border BorderBrush="DarkBlue" BorderThickness="5">
         <ListView  Grid.Row="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding Path=ImageCollection}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectedItem="{Binding Path=SelectedImage}">
             <ListView.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"></SolidColorBrush>
             </ListView.Resources>
@@ -75,7 +75,7 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="Select"  Command="{Binding Path=SelectImages}"></Button>
             <Button Grid.Column="1" Content="Add" Command="{Binding Path=OpenAddPhotoForm}"></Button>
-            <Button Grid.Column="2" Content="Delete"></Button>
+            <Button Grid.Column="2" Content="Delete" Command="{Binding Path=DeleteImage}"></Button>
         </Grid>
     </Grid>
 </Window>

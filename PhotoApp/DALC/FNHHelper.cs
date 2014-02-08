@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Configuration;
 using DALC.Entities;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
-using NHibernate.Cfg;
 using NHibernate.Dialect;
 using NHibernate.Driver;
 using NHibernate.Tool.hbm2ddl;
 using System.Collections.Generic;
+using Configuration = NHibernate.Cfg.Configuration;
 
 namespace DALC
 {
@@ -27,7 +28,7 @@ namespace DALC
             {
                 if (_sessionFactory == null)
                 {
-                    string str = @"Data Source=D:\Git\Projects\PhotoApp\PhotoApp\PhotoApp\DB\PhotoDataBase.sdf;";
+                    var str = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
 
                     var dbConfig = MsSqlCeConfiguration.Standard
                         .ConnectionString(str)
@@ -92,6 +93,37 @@ namespace DALC
             }
 
         }
+
+        private static bool Delete<T>(string columnNameID, int id)
+        {
+            int rowCount = 0;
+
+            ISession sess = FNHHelper.OpenSession();
+            
+            ITransaction tx = sess.BeginTransaction(); ;
+            
+            try
+            {
+                var queryString = string.Format("DELETE FROM {0} WHERE {1} = :{2}",
+                    typeof(T), columnNameID, columnNameID);
+
+                rowCount = sess.CreateQuery(queryString).SetInt32(columnNameID, id).ExecuteUpdate();
+            
+                tx.Commit();
+            }
+            catch (Exception e)
+            {
+                if (tx != null)
+                    tx.Rollback();
+                throw;
+            }
+            finally
+            {
+                sess.Close();
+            }
+
+            return rowCount != 0;
+        }
         #endregion
 
         #region Image
@@ -105,6 +137,10 @@ namespace DALC
             return SelectAll<Image>();
         }
 
+        public static bool DeleteImage(int imageID)
+        {
+            return Delete<Image>("ImageID", imageID);
+        }
         #endregion
     }
 }

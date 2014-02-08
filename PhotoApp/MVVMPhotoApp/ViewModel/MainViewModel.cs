@@ -30,9 +30,7 @@ namespace MVVMPhotoApp.ViewModel
             //    });
         }
 
-        /// <summary>
-        /// The <see cref="ImageCollection" /> property's name.
-        /// </summary>
+        #region ImageCollection
         public const string ImageCollectionPropertyName = "ImageCollection";
 
         private ObservableCollection<ImageModel> _imageCollection = new ObservableCollection<ImageModel>();
@@ -55,8 +53,37 @@ namespace MVVMPhotoApp.ViewModel
                 _imageCollection = value;
                 RaisePropertyChanged(ImageCollectionPropertyName);
             }
-        }
+        } 
+        #endregion
 
+        #region SelectedImage
+        public const string SelectedImagePropertyName = "SelectedImage";
+
+        private ImageModel _selectImageModel = null;
+
+        public ImageModel SelectedImage
+        {
+            get
+            {
+                return _selectImageModel;
+            }
+
+            set
+            {
+                if (_selectImageModel == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(SelectedImagePropertyName);
+                _selectImageModel = value;
+                RaisePropertyChanged(SelectedImagePropertyName);
+            }
+        }
+        
+        #endregion
+
+        #region Command SelectImages
         private RelayCommand _selectImages;
 
         public RelayCommand SelectImages
@@ -70,13 +97,12 @@ namespace MVVMPhotoApp.ViewModel
                                               ImageCollection = FNHHelper.SelectAllImages().ToModel();
                                           }));
             }
-        }
+        } 
+        #endregion
 
+        #region Command OpenAddPhotoForm
         private RelayCommand _openAddPhotoFormCommand;
 
-        /// <summary>
-        /// Gets the OpenAddPhotoForm.
-        /// </summary>
         public RelayCommand OpenAddPhotoForm
         {
             get
@@ -96,6 +122,28 @@ namespace MVVMPhotoApp.ViewModel
             {
                 SelectImages.Execute(null);
             }
-        }
+        } 
+        #endregion
+
+        #region Command DeleteImage
+        private RelayCommand _deleteImageCommand;
+
+        public RelayCommand DeleteImage
+        {
+            get
+            {
+                return _deleteImageCommand
+                    ?? (_deleteImageCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              if (FNHHelper.DeleteImage(SelectedImage.ImageID))
+                                              {
+                                                  SelectImages.Execute(null);
+                                              }
+                                          },
+                                          () => SelectedImage != null));
+            }
+        } 
+        #endregion
     }
 }
