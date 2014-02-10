@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using DALC;
 using GalaSoft.MvvmLight;
@@ -7,6 +9,7 @@ using GalaSoft.MvvmLight.Messaging;
 using MVVMPhotoApp.Extention;
 using MVVMPhotoApp.Model;
 using MVVMPhotoApp.Notifications;
+using MVVMPhotoApp.Utils;
 
 namespace MVVMPhotoApp.ViewModel
 {
@@ -138,10 +141,47 @@ namespace MVVMPhotoApp.ViewModel
                                           {
                                               if (FNHHelper.DeleteImage(SelectedImage.ImageID))
                                               {
-                                                  SelectImages.Execute(null);
+                                                  //SelectImages.Execute(null);
+                                                  ImageCollection.Remove(SelectedImage);
                                               }
                                           },
                                           () => SelectedImage != null));
+            }
+        } 
+        #endregion
+
+        #region Command AddManyPhotos
+        private RelayCommand _addManyCommand;
+
+        /// <summary>
+        /// Gets the AddMany.
+        /// </summary>
+        public RelayCommand AddMany
+        {
+            get
+            {
+                return _addManyCommand
+                    ?? (_addManyCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              Messenger.Default.Send<NotificationMessageAction<List<string>>>
+                                                  (new NotificationMessageAction<List<string>>(MessengerMessage.OPEN_FILE_DIALOG_FORM, 
+                                                      paths => AddManyPhotoFormClosedNotification(paths) ));
+                                          }));
+            }
+        }
+
+        private void AddManyPhotoFormClosedNotification(List<string> paths)
+        {
+            foreach (string path in paths)
+            {
+                FNHHelper.CreateImage(File.ReadAllBytes(path), null, "");
+
+                ImageUtils.BitmapImageFromFile(path);
+            }
+            if (paths.Count != 0)
+            {
+                SelectImages.Execute(null);
             }
         } 
         #endregion

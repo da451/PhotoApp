@@ -1,5 +1,9 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using FluentNHibernate.Testing.Values;
 using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Win32;
 using MVVMPhotoApp.Notifications;
 using MVVMPhotoApp.ViewModel;
 
@@ -26,9 +30,28 @@ namespace MVVMPhotoApp
                         message.Execute(apw.ShowDialog()??false);
                     }
                 });
+
+                Messenger.Default.Register<NotificationMessageAction<List<string>>>(this, (message) => SendImagesSourse(message));
             };
             Closing += (s, e) => ViewModelLocator.Cleanup();
-            
+        }
+
+        private void SendImagesSourse(NotificationMessageAction<List<string>> messageAction)
+        {
+            if (messageAction.Notification == MessengerMessage.OPEN_FILE_DIALOG_FORM)
+            {
+                var ofd = new OpenFileDialog
+                {
+                    Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png",
+                    Multiselect = true
+                };
+
+                if (ofd.ShowDialog() == true)
+                {
+                    messageAction.Execute(ofd.FileNames.ToList());
+                }
+
+            }
         }
     }
 }

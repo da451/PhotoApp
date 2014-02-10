@@ -35,18 +35,6 @@ namespace MVVMPhotoApp
                 }
             });
 
-            //Messenger.Default.Register<string>(this, message =>
-            //{
-            //    if (message == MessengerMessage.OPEN_FILE_DIALOG_FORM)
-            //    {
-            //        var ofd = new OpenFileDialog { Filter = "All files (*.*)|*.*", Multiselect = false };
-            //        if (ofd.ShowDialog() == true)
-            //        {
-            //        }
-
-            //    }
-            //});
-
             Messenger.Default.Register<NotificationMessageAction<string>>(this, (message) => SendImageSourse(message));
         }
 
@@ -54,7 +42,7 @@ namespace MVVMPhotoApp
         {
             if (messageAction.Notification == MessengerMessage.OPEN_FILE_DIALOG_FORM)
             {
-                var ofd = new OpenFileDialog { Filter = "All files (*.*)|*.*", Multiselect = false };
+                var ofd = new OpenFileDialog { Filter = "All images (*.*)|*.*", Multiselect = false };
 
                 if (ofd.ShowDialog() == true)
                 {

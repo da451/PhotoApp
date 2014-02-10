@@ -18,7 +18,7 @@ namespace MVVMPhotoApp.Converter
 
             if (imageBytes != null)
             {
-                image = Utils.ImageUtils.ImageFromBytes(imageBytes);
+                image = Utils.ImageUtils.BytesToImage(imageBytes);
             }
             return image;
         }

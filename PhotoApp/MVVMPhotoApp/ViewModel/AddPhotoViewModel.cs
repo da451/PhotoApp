@@ -136,7 +136,7 @@ namespace MVVMPhotoApp.ViewModel
                                               FNHHelper.CreateImage(Image, null, Name);
                                               Messenger.Default.Send<NotificationMessage<bool>>(new NotificationMessage<bool>(true, MessengerMessage.CLOSE_ADD_PHOTO_FORM));
                                           },
-                                          () => !string.IsNullOrEmpty(Name) && (_imageBytes!=null && _imageBytes.Length!=0)));
+                                          () => (_imageBytes!=null && _imageBytes.Length!=0)));
             }
         }
     }
