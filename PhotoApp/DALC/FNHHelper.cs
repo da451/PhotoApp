@@ -40,8 +40,7 @@ namespace DALC
                     _sessionFactory = Fluently.Configure()
                         .Database(dbConfig)
                         .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Image>())
-                        //.Mappings(m => m.FluentMappings.AddFromAssemblyOf<ColorPalette>())
-                        //.Mappings(m => m.FluentMappings.AddFromAssemblyOf<ColorsOrder>())
+                        .Mappings(m => m.FluentMappings.AddFromAssemblyOf<PColor>())
                         .ExposeConfiguration(x => x.SetProperty("connection.release_mode", "on_close"))
                         .BuildSessionFactory();
 
@@ -141,6 +140,23 @@ namespace DALC
         {
             return Delete<Image>("ImageID", imageID);
         }
+        #endregion
+
+        #region PColor
+        public static void CreatePColor(string name, string value)
+        {
+            Create<PColor>(new PColor(value, name));
+        }
+
+        public static List<PColor> SelectAllPColors()
+        {
+            return SelectAll<PColor>();
+        }
+
+        public static bool DeletePColor(int colorID)
+        {
+            return Delete<PColor>("ColorID", colorID);
+        } 
         #endregion
     }
 }

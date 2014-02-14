@@ -71,8 +71,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Image.cs" />
+    <Compile Include="Entities\PColor.cs" />
     <Compile Include="FNHHelper.cs" />
     <Compile Include="Mappings\ImageMap.cs" />
+    <Compile Include="Mappings\PColorMap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

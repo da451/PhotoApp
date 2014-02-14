@@ -23,5 +23,18 @@ namespace MVVMPhotoApp.Extention
             return res;
         }
 
+        public static ObservableCollection<PColorModel> ToModel(this IEnumerable<PColor> pcolors)
+        {
+            ObservableCollection<PColorModel> res = new ObservableCollection<PColorModel>();
+
+            if (pcolors != null && pcolors.Count() != 0)
+            {
+                var colorModels = pcolors.Select(o => new PColorModel(o.ColorID, o.Value, o.Name)).ToList();
+
+                res = new ObservableCollection<PColorModel>(colorModels);
+            }
+
+            return res;
+        }
     }
 }

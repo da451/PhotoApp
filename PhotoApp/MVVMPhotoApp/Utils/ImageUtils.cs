@@ -98,7 +98,7 @@ namespace MVVMPhotoApp.Utils
 
             using (MemoryStream memoryStream = new MemoryStream())
             {
-                JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+                BitmapEncoder encoder = new PngBitmapEncoder(); // new JpegBitmapEncoder();
 
                 encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
 
@@ -111,16 +111,36 @@ namespace MVVMPhotoApp.Utils
                 bitmapImage.EndInit();
 
             }
-            string path = string.Format(@"C:\{0}_{1}_{2}_{3}.jpg", DateTime.Now.Hour, DateTime.Now.Minute,
-                DateTime.Now.Second, DateTime.Now.Millisecond);
-            using (FileStream fileStream = new FileStream(path, FileMode.CreateNew))
-            {
 
-                JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+            return bitmapImage;
+        }
+
+        public static BitmapImage BitmapImageOptimize(BitmapImage bitmapSource)
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+
+            int h = bitmapSource.PixelHeight;
+
+            int w = bitmapSource.PixelWidth;
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder(); // new JpegBitmapEncoder();
 
                 encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
 
-                encoder.Save(fileStream);
+                encoder.Save(memoryStream);
+
+                bitmapImage.BeginInit();
+
+                bitmapImage.DecodePixelHeight = h / 2;
+
+                bitmapImage.DecodePixelHeight = w / 2;
+
+                bitmapImage.StreamSource = new MemoryStream(memoryStream.ToArray());
+
+                bitmapImage.EndInit();
+
             }
 
             return bitmapImage;
@@ -138,7 +158,7 @@ namespace MVVMPhotoApp.Utils
 
             using (MemoryStream memoryStream = new MemoryStream())
             {
-                JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+                BitmapEncoder encoder = new JpegBitmapEncoder();
 
                 encoder.Frames.Add(bitmapFrame);
                 
@@ -155,18 +175,22 @@ namespace MVVMPhotoApp.Utils
                 bitmapImage.EndInit();
 
             }
+            return bitmapImage;
+        }
+
+        public static void SaveImage(BitmapImage bitmapImage)
+        {
             string pathFile = string.Format(@"C:\{0}_{1}_{2}_{3}.jpg", DateTime.Now.Hour, DateTime.Now.Minute,
                 DateTime.Now.Second, DateTime.Now.Millisecond);
+
             using (FileStream fileStream = new FileStream(pathFile, FileMode.CreateNew))
             {
+                BitmapEncoder encoder = new JpegBitmapEncoder();
 
-                JpegBitmapEncoder encoder = new JpegBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
 
                 encoder.Save(fileStream);
             }
-
-            return bitmapImage;
         }
     }
 }

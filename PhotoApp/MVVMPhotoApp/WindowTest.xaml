@@ -1,0 +1,46 @@
+﻿<Window x:Class="MVVMPhotoApp.WindowTest"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:p="clr-namespace:MVVMPhotoApp.ViewModel"
+    Title="Add Photo Form" Height="530" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <p:TestViewModel x:Key="test"/>
+    </Window.Resources>
+    <Grid DataContext="{StaticResource test}">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid  Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0"  Source="{Binding Path=Image, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
+            <Image Grid.Column="1" Source="{Binding Path=NewImage, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
+            <ListView Grid.Column="2"  ItemsSource="{Binding Path=Colors}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Black" BorderThickness="1">
+                            <Label Width="100" Background="{Binding Path=Name, Converter={StaticResource ItemConverter}}" Content="{Binding Path=Name}">
+                                
+                            </Label>
+                        </Border>
+                        
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Open" Command="{Binding Path=OpenFileDialog}"></Button>
+            <Button Grid.Column="2" Content="Close" Command="{Binding Path=CloseForm}"></Button>
+            <Button Grid.Column="1" Content="Convert" Command="{Binding Path=Convert}"></Button>
+        </Grid>
+    </Grid>
+</Window>
