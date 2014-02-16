@@ -16,6 +16,7 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition Width="150"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Image Grid.Column="0"  Source="{Binding Path=Image, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
             <Image Grid.Column="1" Source="{Binding Path=NewImage, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
@@ -23,11 +24,28 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Border BorderBrush="Black" BorderThickness="1">
-                            <Label Width="100" Background="{Binding Path=Name, Converter={StaticResource ItemConverter}}" Content="{Binding Path=Name}">
+                            <Label Width="100" Background="{Binding Path=., Converter={StaticResource ItemConverter}}" Content="{Binding Path=.}">
                                 
                             </Label>
                         </Border>
                         
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <ListView Grid.Column="3"  ItemsSource="{Binding Path=TupleColors}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Black" BorderThickness="1">
+                            <StackPanel Orientation="Horizontal">
+                            <Label Width="50" Background="{Binding Path=Item1, Converter={StaticResource ItemConverter}}" Content="{Binding Path=Item1}">
+                            </Label>
+                            <Label Width="50" Background="{Binding Path=Item2, Converter={StaticResource ItemConverter}}" Content="{Binding Path=Item2}">
+                            </Label>
+                            <Label Width="50" Background="{Binding Path=Item3, Converter={StaticResource ItemConverter}}" Content="{Binding Path=Item3}">
+                            </Label>
+                            </StackPanel>
+                        </Border>
+
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

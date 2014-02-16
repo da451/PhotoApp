@@ -2,17 +2,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DALC;
 using DALC.Mapping;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using MVVMPhotoApp.Extention;
+using MVVMPhotoApp.Model;
 using MVVMPhotoApp.Notifications;
 using MVVMPhotoApp.Utils;
+using PhotoApp.Utils;
+using ColorConverter = System.Windows.Media.ColorConverter;
 
 namespace MVVMPhotoApp.ViewModel
 {
@@ -24,16 +28,13 @@ namespace MVVMPhotoApp.ViewModel
     /// </summary>
     public class TestViewModel : ViewModelBase
     {
-        /// <summary>
-        /// Initializes a new instance of the TestViewModel class.
-        /// </summary>
         public TestViewModel()
         {
+            _baseColors = FNHHelper.SelectAllPColors().ToModel().ToList();
         }
 
-        /// <summary>
-        /// The <see cref="Colors" /> property's name.
-        /// </summary>
+        private List<PColorModel> _baseColors;
+
         public const string ColorsPropertyName = "Colors";
 
         private ObservableCollection<Color> _colors = new ObservableCollection<Color>();
@@ -58,9 +59,7 @@ namespace MVVMPhotoApp.ViewModel
             }
         }
 
-        /// <summary>
-        /// The <see cref="Image" /> property's name.
-        /// </summary>
+
         public const string ImagePropertyName = "Image";
 
         private BitmapImage _image = new BitmapImage();
@@ -85,9 +84,8 @@ namespace MVVMPhotoApp.ViewModel
             }
         }
 
-        /// <summary>
-        /// The <see cref="NewImage" /> property's name.
-        /// </summary>
+
+
         public const string NewImagePropertyName = "NewImage";
 
         private BitmapImage _newImage = new BitmapImage();
@@ -113,11 +111,9 @@ namespace MVVMPhotoApp.ViewModel
         }
 
 
+
         private RelayCommand _closeFormCommand;
 
-        /// <summary>
-        /// Gets the CloseForm.
-        /// </summary>
         public RelayCommand CloseForm
         {
             get
@@ -131,11 +127,9 @@ namespace MVVMPhotoApp.ViewModel
             }
         }
 
+
         private RelayCommand _openFileDialogCommand;
 
-        /// <summary>
-        /// Gets the OpenFileDialog.
-        /// </summary>
         public RelayCommand OpenFileDialog
         {
             get
@@ -157,11 +151,9 @@ namespace MVVMPhotoApp.ViewModel
             Image = ImageUtils.BitmapImageFromFile(path);
         }
 
+
         private RelayCommand _convertCommand;
 
-        /// <summary>
-        /// Gets the MyCommand.
-        /// </summary>
         public RelayCommand Convert
         {
             get
@@ -170,11 +162,68 @@ namespace MVVMPhotoApp.ViewModel
                     ?? (_convertCommand = new RelayCommand(
                                           () =>
                                           {
+                                              TupleColors = new ObservableCollection<Tuple<Color, Color, Color>>();
+
                                               NewImage = AForgeUtil.ImageQuantizer(Image);
+
                                               IList<Color> colors = AForgeUtil.GetImagePalette(Image);
+
                                               Colors = new ObservableCollection<Color>(colors);
+
+                                              foreach (Color color in colors)
+                                              {
+                                                  TupleColors.Add(StringToColor(color));
+                                              }
                                           }));
+            }
+        }
+
+        private Tuple<Color, Color, Color> StringToColor(Color color)
+        {
+            IList<PColorModel> colors = ColorUtil.CompareColors(_baseColors, new PColorModel(color.ToString(), ""), 3);
+
+            return new Tuple<Color, Color, Color>(
+                PColorModelToColor(colors[0]), 
+                PColorModelToColor(colors[1]), 
+                PColorModelToColor(colors[2])
+                );
+        }
+
+        private Color PColorModelToColor(PColorModel color)
+        {
+            var colorObj = ColorConverter.ConvertFromString(color.Value);
+            if (colorObj != null)
+            {
+                Color c = (Color)ColorConverter.ConvertFromString(colorObj.ToString());
+                return c;
+            }
+            return new Color();
+        }
+
+        public const string TupleColorsPropertyName = "TupleColors";
+
+        private ObservableCollection<Tuple<Color, Color, Color>> _tupleColors;
+
+        public ObservableCollection<Tuple<Color, Color, Color>> TupleColors
+        {
+            get
+            {
+                return _tupleColors;
+            }
+
+            set
+            {
+                if (_tupleColors == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(TupleColorsPropertyName);
+                _tupleColors = value;
+                RaisePropertyChanged(TupleColorsPropertyName);
             }
         }
     }
 }
+
+

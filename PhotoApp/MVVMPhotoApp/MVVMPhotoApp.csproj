@@ -113,6 +113,7 @@
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="Extention\CollectionOfEntityExtensions.cs" />
     <Compile Include="Extention\CollectionOfModelExtensions.cs" />
+    <Compile Include="Extention\DColor.cs" />
     <Compile Include="Extention\ImageExtensions.cs" />
     <Compile Include="Model\DataItem.cs" />
     <Compile Include="Model\DataService.cs" />

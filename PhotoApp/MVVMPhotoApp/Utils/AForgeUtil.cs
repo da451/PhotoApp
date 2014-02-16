@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using AForge.Imaging.ColorReduction;
+using MVVMPhotoApp.Extention;
+using Color = System.Windows.Media.Color;
 
 namespace MVVMPhotoApp.Utils
 {
@@ -30,7 +32,7 @@ namespace MVVMPhotoApp.Utils
 
             Bitmap bitmap = ImageUtils.BitmapImageToBitmap(image);
 
-            Color[] colors = ciq.CalculatePalette(bitmap, _paletteColorCount);
+            Color[] colors = ciq.CalculatePalette(bitmap, _paletteColorCount).Select(o=> o.ToMediaColor()).ToArray();
 
             return colors.ToList();
         }

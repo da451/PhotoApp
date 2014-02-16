@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.ObjectModel;
+using System.IO;
 using System.Security.AccessControl;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DALC;
 using GalaSoft.MvvmLight;
@@ -137,6 +139,84 @@ namespace MVVMPhotoApp.ViewModel
                                               Messenger.Default.Send<NotificationMessage<bool>>(new NotificationMessage<bool>(true, MessengerMessage.CLOSE_ADD_PHOTO_FORM));
                                           },
                                           () => (_imageBytes!=null && _imageBytes.Length!=0)));
+            }
+        }
+
+
+
+
+        public const string ColorsPropertyName = "Colors";
+
+        private ObservableCollection<Color> _colors = new ObservableCollection<Color>();
+
+        public ObservableCollection<Color> Colors
+        {
+            get
+            {
+                return _colors;
+            }
+
+            set
+            {
+                if (_colors == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(ColorsPropertyName);
+                _colors = value;
+                RaisePropertyChanged(ColorsPropertyName);
+            }
+        }
+
+
+        public const string OldImagePropertyName = "OldImage";
+
+        private BitmapImage _oldImage ;
+
+        public BitmapImage OldImage
+        {
+            get
+            {
+                return _oldImage;
+            }
+
+            set
+            {
+                if (_oldImage == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(OldImagePropertyName);
+                _oldImage = value;
+                RaisePropertyChanged(OldImagePropertyName);
+            }
+        }
+      
+
+
+        public const string NewImagePropertyName = "NewImage";
+
+        private BitmapImage _newImage;
+
+        public BitmapImage NewImage
+        {
+            get
+            {
+                return _newImage;
+            }
+
+            set
+            {
+                if (_newImage == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(NewImagePropertyName);
+                _newImage = value;
+                RaisePropertyChanged(NewImagePropertyName);
             }
         }
     }
