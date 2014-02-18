@@ -19,7 +19,7 @@
                 <ColumnDefinition Width="150"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Image Grid.Column="0"  Source="{Binding Path=Image, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
-            <Image Grid.Column="1" Source="{Binding Path=NewImage, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
+            <Image Grid.Column="1" Source="{Binding Path=NewImageByte, Mode=OneWay,IsAsync=True, Converter={StaticResource ImageConverter}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
             <ListView Grid.Column="2"  ItemsSource="{Binding Path=Colors}">
                 <ListView.ItemTemplate>
                     <DataTemplate>

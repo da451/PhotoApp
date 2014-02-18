@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using DALC;
 using DALC.Mapping;
 using GalaSoft.MvvmLight;
@@ -32,6 +34,8 @@ namespace MVVMPhotoApp.ViewModel
         {
             _baseColors = FNHHelper.SelectAllPColors().ToModel().ToList();
         }
+
+        private readonly object syncRoot = new object();
 
         private List<PColorModel> _baseColors;
 
@@ -162,18 +166,44 @@ namespace MVVMPhotoApp.ViewModel
                     ?? (_convertCommand = new RelayCommand(
                                           () =>
                                           {
-                                              TupleColors = new ObservableCollection<Tuple<Color, Color, Color>>();
-
-                                              NewImage = AForgeUtil.ImageQuantizer(Image);
-
-                                              IList<Color> colors = AForgeUtil.GetImagePalette(Image);
-
-                                              Colors = new ObservableCollection<Color>(colors);
-
-                                              foreach (Color color in colors)
+                                              Task<byte[]> imgQuanTask = new Task<byte[]>(
+                                                  (img) =>
+                                                  {
+                                                      byte[] byteImage;
+                                                      Dictionary<Color,int> imageColors =
+                                                          AForgeUtil.ImageQuantizerByte((BitmapImage)img, 3, out  byteImage);
+                                                      return byteImage;
+                                                  }, Image);
+                                              imgQuanTask.ContinueWith(task =>
                                               {
-                                                  TupleColors.Add(StringToColor(color));
-                                              }
+                                                  try
+                                                  {
+                                                      NewImageByte = task.Result;
+                                                      
+                                                  }
+                                                  catch (Exception ex)
+                                                  {
+                                                      throw ex;
+                                                  }
+                                                  finally
+                                                  {
+                                                  }
+                                              }, TaskScheduler.FromCurrentSynchronizationContext());
+                                              imgQuanTask.Start();
+
+                                              Task<IList<Color>> GetImagePaletteTask = new Task<IList<Color>>((img)=>  AForgeUtil.GetImagePalette((BitmapImage) img),Image);
+                                              GetImagePaletteTask.ContinueWith(task =>
+                                              {
+                                                  TupleColors = new ObservableCollection<Tuple<Color, Color, Color>>();
+
+                                                  Colors = new ObservableCollection<Color>(task.Result);
+
+                                                  foreach (Color color in Colors)
+                                                  {
+                                                      TupleColors.Add(StringToColor(color));
+                                                  }
+                                              }, TaskScheduler.FromCurrentSynchronizationContext());
+                                              GetImagePaletteTask.Start();
                                           }));
             }
         }
@@ -218,11 +248,40 @@ namespace MVVMPhotoApp.ViewModel
                     return;
                 }
 
-                RaisePropertyChanging(TupleColorsPropertyName);
-                _tupleColors = value;
-                RaisePropertyChanged(TupleColorsPropertyName);
+            //lock (syncRoot)
+                {
+
+                    RaisePropertyChanging(TupleColorsPropertyName);
+                    _tupleColors = value;
+                    RaisePropertyChanged(TupleColorsPropertyName);
+                }
             }
         }
+
+        public const string NewImageBytePropertyName = "NewImageByte";
+
+        private byte[] _newImageByte = new byte[0];
+
+        public byte[] NewImageByte
+        {
+            get
+            {
+                return _newImageByte;
+            }
+
+            set
+            {
+                if (_newImageByte == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(NewImageBytePropertyName);
+                _newImageByte = value;
+                RaisePropertyChanged(NewImageBytePropertyName);
+            }
+        }
+
     }
 }
 

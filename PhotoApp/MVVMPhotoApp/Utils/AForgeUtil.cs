@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using AForge.Imaging.ColorReduction;
 using MVVMPhotoApp.Extention;
@@ -24,7 +27,79 @@ namespace MVVMPhotoApp.Utils
             Bitmap reducedImage = ciq.ReduceColors(bitmap, _paletteColorCount);
 
             return ImageUtils.BitmapToBitmapImage(reducedImage);
+        }     
+  
+        public static byte[] ImageQuantizerByte(BitmapImage image)
+        {
+            ColorImageQuantizer ciq = new ColorImageQuantizer(new MedianCutQuantizer());
+
+            Bitmap bitmap = ImageUtils.BitmapImageToBitmap(image);
+
+            Bitmap reducedImage = ciq.ReduceColors(bitmap, _paletteColorCount);
+
+            ImageConverter converter = new ImageConverter();
+
+            return (byte[])converter.ConvertTo(reducedImage, typeof(byte[]));
         }
+
+        public static Dictionary<Color, int> ImageQuantizerByte(BitmapImage image, int colorCount , out byte[] byteImage)
+        {
+            ColorImageQuantizer ciq = new ColorImageQuantizer(new MedianCutQuantizer());
+
+            Bitmap bitmap = ImageUtils.BitmapImageToBitmap(image);
+
+            Bitmap reducedImage = ciq.ReduceColors(bitmap, _paletteColorCount);
+
+            ImageConverter converter = new ImageConverter();
+
+            byteImage = (byte[])converter.ConvertTo(reducedImage, typeof(byte[]));
+            
+            Rectangle rect = new Rectangle(0, 0, reducedImage.Width, reducedImage.Height);
+
+            BitmapData bmpData = reducedImage.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+            IntPtr ptr = bmpData.Scan0;
+
+            int bytes = bmpData.Stride*reducedImage.Height;
+
+            byte[] rgbValues = new byte[bytes];
+
+// Copy the RGB values into the array.
+            Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+            Dictionary<Color, int> pixelsCount = new Dictionary<Color, int>();
+
+            int stride = bmpData.Stride;
+
+            for (int column = 0; column < bmpData.Height; column++)
+            {
+                for (int row = 0; row < bmpData.Width; row++)
+                {
+                    byte blue = (byte) (rgbValues[(column*stride) + (row*3)]);
+
+                    byte green = (byte) (rgbValues[(column*stride) + (row*3) + 1]);
+
+                    byte red = (byte) (rgbValues[(column*stride) + (row*3) + 2]);
+
+                    Color c = Color.FromRgb(red, green, blue);
+
+                    if (!pixelsCount.ContainsKey(c))
+                    {
+                        pixelsCount.Add(c,1);
+                    }
+                    else
+                    {
+                        pixelsCount[c]++;
+                    }
+
+                }
+            }
+            var res = pixelsCount.OrderByDescending(o => o.Value)
+                .Take(colorCount)
+                .ToDictionary(k => k.Key, v => v.Value);
+            return  res;
+        }
+
 
         public static IList<Color> GetImagePalette(BitmapImage image)
         {
