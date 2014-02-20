@@ -20,6 +20,8 @@ namespace DALC
             OpenSession();
         }
 
+        private static readonly object m_syncRoot = new object();
+
         private static ISessionFactory _sessionFactory;
 
         public static ISessionFactory SessionFactory
@@ -28,23 +30,27 @@ namespace DALC
             {
                 if (_sessionFactory == null)
                 {
-                    var str = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+                    lock (m_syncRoot)
+                    {
+                        if (_sessionFactory == null)
+                        {
+                            var str = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
 
-                    var dbConfig = MsSqlCeConfiguration.Standard
-                        .ConnectionString(str)
-                        .Driver<SqlClientDriver>()
-                        .Dialect<MsSqlCeDialect>()
-                        .Driver<SqlServerCeDriver>()
-                        .ShowSql();
+                            var dbConfig = MsSqlCeConfiguration.Standard
+                                .ConnectionString(str)
+                                .Driver<SqlClientDriver>()
+                                .Dialect<MsSqlCeDialect>()
+                                .Driver<SqlServerCeDriver>()
+                                .ShowSql();
 
-                    _sessionFactory = Fluently.Configure()
-                        .Database(dbConfig)
-                        .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Image>())
-                        .Mappings(m => m.FluentMappings.AddFromAssemblyOf<PColor>())
-                        .ExposeConfiguration(x => x.SetProperty("connection.release_mode", "on_close"))
-                        .BuildSessionFactory();
-
-
+                            _sessionFactory = Fluently.Configure()
+                                .Database(dbConfig)
+                                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Image>())
+                                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<PColor>())
+                                .ExposeConfiguration(x => x.SetProperty("connection.release_mode", "on_close"))
+                                .BuildSessionFactory();
+                        }
+                    }
                 }
                 return _sessionFactory;
             }
@@ -59,6 +65,11 @@ namespace DALC
         public static ISession OpenSession()
         {
             return SessionFactory.OpenSession();
+        }
+
+        public static void CreateSession()
+        {
+            SessionFactory.OpenSession();
         }
         #endregion
 

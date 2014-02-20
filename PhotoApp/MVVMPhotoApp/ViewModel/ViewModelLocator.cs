@@ -9,6 +9,8 @@
   DataContext="{Binding Source={StaticResource Locator}, Path=ViewModelName}"
 */
 
+using System.Threading.Tasks;
+using DALC;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
@@ -39,6 +41,11 @@ namespace MVVMPhotoApp.ViewModel
             }
 
             SimpleIoc.Default.Register<MainViewModel>();
+
+            new Task(() =>
+            {
+                FNHHelper.CreateSession();
+            }).Start();
         }
 
         /// <summary>

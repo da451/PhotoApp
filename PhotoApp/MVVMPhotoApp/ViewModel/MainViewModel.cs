@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using DALC;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -33,6 +37,35 @@ namespace MVVMPhotoApp.ViewModel
             //    });
         }
 
+        private readonly object syncRoot = new object();
+
+        
+        public const string TimePropertyName = "Time";
+
+        private string _time;
+
+        public string Time
+        {
+            get
+            {
+                return _time;
+            }
+
+            set
+            {
+                if (_time == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(TimePropertyName);
+                _time = value;
+                RaisePropertyChanged(TimePropertyName);
+            }
+        }
+
+
+
         #region ImageCollection
         public const string ImageCollectionPropertyName = "ImageCollection";
 
@@ -58,6 +91,35 @@ namespace MVVMPhotoApp.ViewModel
             }
         } 
         #endregion
+
+
+        /// <summary>
+        /// The <see cref="BitmapImages" /> property's name.
+        /// </summary>
+        public const string BitmapImagesPropertyName = "BitmapImages";
+
+        private ObservableCollection<BitmapImage> _bitmapImages;
+
+        public ObservableCollection<BitmapImage> BitmapImages
+        {
+            get
+            {
+                return _bitmapImages;
+            }
+
+            set
+            {
+                if (_bitmapImages == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(BitmapImagesPropertyName);
+                _bitmapImages = value;
+                RaisePropertyChanged(BitmapImagesPropertyName);
+            }
+        }
+
 
         #region SelectedImage
         public const string SelectedImagePropertyName = "SelectedImage";
@@ -94,13 +156,33 @@ namespace MVVMPhotoApp.ViewModel
             get
             {
                 return _selectImages
-                    ?? (_selectImages = new RelayCommand(
-                                          () =>
-                                          {
-                                              ImageCollection = FNHHelper.SelectAllImages().ToModel();
-                                          }));
+                       ?? (_selectImages = new RelayCommand(
+                           () =>
+                           {
+                               ImageModel[] imgModels = FNHHelper.SelectAllImages().ToModel().ToArray();
+
+                               BitmapImages = new ObservableCollection<BitmapImage>();
+
+                               foreach (ImageModel imageModel in imgModels)
+                               {
+                                   Task<BitmapImage> imageTask =
+                                       new Task<BitmapImage>(
+                                           (imgModel) => ImageUtils.BytesToImage(((ImageModel) imgModel).Img),
+                                           imageModel);
+
+                                   imageTask.ContinueWith(task =>
+                                   {
+                                       task.Result.Freeze();
+                                       BitmapImages.Add(task.Result);
+
+                                   }, TaskScheduler.FromCurrentSynchronizationContext());
+
+                                   imageTask.Start();
+                               }
+                           }));
             }
-        } 
+        }
+
         #endregion
 
         #region Command OpenAddPhotoForm
@@ -141,7 +223,6 @@ namespace MVVMPhotoApp.ViewModel
                                           {
                                               if (FNHHelper.DeleteImage(SelectedImage.ImageID))
                                               {
-                                                  //SelectImages.Execute(null);
                                                   ImageCollection.Remove(SelectedImage);
                                               }
                                           },
