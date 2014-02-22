@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DALC;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using MVVMPhotoApp.Extention;
 using MVVMPhotoApp.Model;
 using MVVMPhotoApp.Notifications;
 using MVVMPhotoApp.Utils;
@@ -192,9 +194,6 @@ namespace MVVMPhotoApp.ViewModel
         private void GetImageSourse(string path)
         {
             Image = File.ReadAllBytes(path);
-
-            Dictionary<Color,double> colorDic =  AForgeUtil.ImageQuantizerByte(Image, 3);
-            Colors = new ObservableCollection<PColorModel>( ColorUtil.DictionaryToKnownPColorList(colorDic));
         }
 
 
@@ -209,7 +208,22 @@ namespace MVVMPhotoApp.ViewModel
                     ?? (_saveImageCommand = new RelayCommand(
                                           () =>
                                           {
-                                              FNHHelper.CreateImage(Image, null, Name);
+                                              int imageID = FNHHelper.CreateImage(Image, null, Name);
+
+                                              Task taskFindDomainColors = new Task(id =>
+                                              {
+                                                  ImageModel imageModel = FNHHelper.SelectImagesByID((int)id).ToImageModel();
+
+                                                  Dictionary<Color, double> colorDic = AForgeUtil.ImageQuantizerByte(imageModel.Img, 3);
+
+                                                  imageModel.ImageColors = new ObservableCollection<PColorModel>(ColorUtil.DictionaryToKnownPColorList(colorDic));
+
+                                                  FNHHelper.UpdateImage((DALC.Entities.Image)imageModel);
+
+                                              }, imageID);
+
+                                              taskFindDomainColors.Start();
+
                                               Messenger.Default.Send<NotificationMessage<bool>>(new NotificationMessage<bool>(true, MessengerMessage.CLOSE_ADD_PHOTO_FORM));
                                           },
                                           () => (_imageBytes!=null && _imageBytes.Length!=0)));

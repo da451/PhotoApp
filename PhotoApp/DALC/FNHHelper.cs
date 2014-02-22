@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Configuration;
+using System.Linq;
 using DALC.Entities;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
+using NHibernate.Criterion;
 using NHibernate.Dialect;
 using NHibernate.Driver;
 using NHibernate.Tool.hbm2ddl;
 using System.Collections.Generic;
+using NHibernate.Type;
 using Configuration = NHibernate.Cfg.Configuration;
 
 namespace DALC
@@ -89,14 +92,49 @@ namespace DALC
             return res;
         }
 
-        private static void Create<T>(T value)
+        private static T SelectByID<T>(string columnNameID, int id) where T : class
+        {
+            ICriteria criteria = OpenSession().CreateCriteria<T>().Add(Restrictions.Eq(columnNameID, id));
+            T res = (T)criteria.List<T>().First();
+            return res;
+        }
+
+        private static int Create<T>(T value)
         {
             ISession sess = FNHHelper.OpenSession();
-            ITransaction tx = sess.BeginTransaction(); ;
+            ITransaction tx = sess.BeginTransaction();
+            int id=-1;
             try
             {
 
-                sess.Save(value);
+                id = Convert.ToInt32(sess.Save(value));
+                tx.Commit();
+            }
+            catch (Exception e)
+            {
+                if (tx != null)
+                    tx.Rollback();
+                throw;
+            }
+            finally
+            {
+                sess.Close();
+            }
+            return id;
+        }
+
+        private static bool Update<T>(T value)
+        {
+            int rowCount = 0;
+
+            ISession sess = FNHHelper.OpenSession();
+
+            ITransaction tx = sess.BeginTransaction(); ;
+
+            try
+            {
+                sess.Update(value);
+
                 tx.Commit();
             }
             catch (Exception e)
@@ -110,6 +148,7 @@ namespace DALC
                 sess.Close();
             }
 
+            return rowCount != 0;
         }
 
         private static bool Delete<T>(string columnNameID, int id)
@@ -142,17 +181,18 @@ namespace DALC
 
             return rowCount != 0;
         }
+
         #endregion
 
         #region Image
-        public static void CreateImage(byte[] img, byte[] thambnail, string name)
+        public static int CreateImage(byte[] img, byte[] thambnail, string name)
         {
-            Create<Image>(new Image(img, thambnail, name,null));
+            return Create<Image>(new Image(img, thambnail, name, new List<PColor>()));
         }
 
-        public static void CreateImage(byte[] img, byte[] thambnail, string name, IList<PColor> colors )
+        public static int CreateImage(byte[] img, byte[] thambnail, string name, IList<PColor> colors )
         {
-            Create<Image>(new Image(img, thambnail, name,colors));
+            return Create<Image>(new Image(img, thambnail, name,colors));
         }
 
         public static List<Image> SelectAllImages()
@@ -160,16 +200,26 @@ namespace DALC
             return SelectAll<Image>();
         }
 
+        public static Image SelectImagesByID(int imageID)
+        {
+            return SelectByID<Image>("ImageID",imageID);
+        }
+
         public static bool DeleteImage(int imageID)
         {
             return Delete<Image>("ImageID", imageID);
         }
+
+        public static void UpdateImage(Image image)
+        {
+            Update<Image>(image);
+        }
         #endregion
 
         #region PColor
-        public static void CreatePColor(string name, string value)
+        public static int CreatePColor(string name, string value)
         {
-            Create<PColor>(new PColor(value, name));
+            return Create<PColor>(new PColor(value, name));
         }
 
         public static List<PColor> SelectAllPColors()

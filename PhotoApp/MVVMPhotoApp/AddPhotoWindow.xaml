@@ -9,22 +9,11 @@
     </Window.Resources>
     <Grid DataContext="{StaticResource photoVM}" >
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
             <RowDefinition/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="{Binding Path=Colors[0].Percent, Converter={StaticResource WidthValueConverter}}"></ColumnDefinition>
-                <ColumnDefinition Width="{Binding Path=Colors[1].Percent, Converter={StaticResource WidthValueConverter}}"></ColumnDefinition>
-                <ColumnDefinition Width="{Binding Path=Colors[2].Percent, Converter={StaticResource WidthValueConverter}}"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding Path=Colors[0].Value, Converter={StaticResource ItemConverter}}"/>
-            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding Path=Colors[1].Value, Converter={StaticResource ItemConverter}}"/>
-            <Label Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding Path=Colors[2].Value, Converter={StaticResource ItemConverter}}"/> 
-        </Grid>
-        <Image Grid.Row="1" Source="{Binding Path=Image, Converter={StaticResource ImageConverter}, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
-        <Grid Grid.Row="2">
+        <Image Grid.Row="0" Source="{Binding Path=Image, Converter={StaticResource ImageConverter}, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
