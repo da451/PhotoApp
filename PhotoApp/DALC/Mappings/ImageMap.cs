@@ -24,6 +24,12 @@ namespace DALC.Mapping
             
             Map(x => x.Name).Column("NAME");
 
+            HasManyToMany(x => x.Colors).
+                Table("[IMAGE.PCOLORS]").
+                ParentKeyColumn("COLOR_ID").
+                ChildKeyColumn("IMAGE_ID").
+                Cascade.SaveUpdate();
+
         }
     }
 

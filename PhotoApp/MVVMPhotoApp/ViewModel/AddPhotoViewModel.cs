@@ -1,5 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Security.AccessControl;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -9,6 +12,8 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using MVVMPhotoApp.Model;
 using MVVMPhotoApp.Notifications;
+using MVVMPhotoApp.Utils;
+using PhotoApp.Utils;
 
 namespace MVVMPhotoApp.ViewModel
 {
@@ -19,17 +24,10 @@ namespace MVVMPhotoApp.ViewModel
         {
         }
 
-        /// <summary>
-        /// The <see cref="Name" /> property's name.
-        /// </summary>
         public const string NamePropertyName = "Name";
 
         private string _name;
 
-        /// <summary>
-        /// Sets and gets the Name property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
         public string Name
         {
             get
@@ -50,9 +48,8 @@ namespace MVVMPhotoApp.ViewModel
             }
         }
 
-        /// <summary>
-        /// The <see cref="Image" /> property's name.
-        /// </summary>
+
+        
         public const string ImagePropertyName = "Image";
 
         private byte[] _imageBytes;
@@ -77,79 +74,13 @@ namespace MVVMPhotoApp.ViewModel
             }
         }
 
-        private RelayCommand _closeFormCommand;
-
-        /// <summary>
-        /// Gets the CloseForm.
-        /// </summary>
-        public RelayCommand CloseForm
-        {
-            get
-            {
-                return _closeFormCommand
-                    ?? (_closeFormCommand = new RelayCommand(
-                                          () =>
-                                          {
-                                              Messenger.Default.Send<NotificationMessage<bool>>(new NotificationMessage<bool>(false, MessengerMessage.CLOSE_ADD_PHOTO_FORM));
-                                          }));
-            }
-        }
-
-        private RelayCommand _openFileDialogCommand;
-
-        /// <summary>
-        /// Gets the OpenFileDialog.
-        /// </summary>
-        public RelayCommand OpenFileDialog
-        {
-            get
-            {
-                return _openFileDialogCommand
-                    ?? (_openFileDialogCommand = new RelayCommand(
-                                          () =>
-                                          {
-                                              var message =
-                                                  new NotificationMessageAction<string>(
-                                                      MessengerMessage.OPEN_FILE_DIALOG_FORM, GetImageSourse);
-                                              Messenger.Default.Send(message);
-                                          }));
-            }
-        }
-
-        private void GetImageSourse(string path)
-        {
-            Image = File.ReadAllBytes(path);
-        }
-
-
-        private RelayCommand _saveImageCommand;
-
-        /// <summary>
-        /// Gets the SaveImage.
-        /// </summary>
-        public RelayCommand SaveImage
-        {
-            get
-            {
-                return _saveImageCommand
-                    ?? (_saveImageCommand = new RelayCommand(
-                                          () =>
-                                          {
-                                              FNHHelper.CreateImage(Image, null, Name);
-                                              Messenger.Default.Send<NotificationMessage<bool>>(new NotificationMessage<bool>(true, MessengerMessage.CLOSE_ADD_PHOTO_FORM));
-                                          },
-                                          () => (_imageBytes!=null && _imageBytes.Length!=0)));
-            }
-        }
-
-
 
 
         public const string ColorsPropertyName = "Colors";
 
-        private ObservableCollection<Color> _colors = new ObservableCollection<Color>();
+        private ObservableCollection<PColorModel> _colors = new ObservableCollection<PColorModel>();
 
-        public ObservableCollection<Color> Colors
+        public ObservableCollection<PColorModel> Colors
         {
             get
             {
@@ -170,9 +101,10 @@ namespace MVVMPhotoApp.ViewModel
         }
 
 
+
         public const string OldImagePropertyName = "OldImage";
 
-        private BitmapImage _oldImage ;
+        private BitmapImage _oldImage;
 
         public BitmapImage OldImage
         {
@@ -193,7 +125,7 @@ namespace MVVMPhotoApp.ViewModel
                 RaisePropertyChanged(OldImagePropertyName);
             }
         }
-      
+
 
 
         public const string NewImagePropertyName = "NewImage";
@@ -217,6 +149,70 @@ namespace MVVMPhotoApp.ViewModel
                 RaisePropertyChanging(NewImagePropertyName);
                 _newImage = value;
                 RaisePropertyChanged(NewImagePropertyName);
+            }
+        }
+
+       
+        
+        private RelayCommand _closeFormCommand;
+
+        public RelayCommand CloseForm
+        {
+            get
+            {
+                return _closeFormCommand
+                    ?? (_closeFormCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              Messenger.Default.Send<NotificationMessage<bool>>(new NotificationMessage<bool>(false, MessengerMessage.CLOSE_ADD_PHOTO_FORM));
+                                          }));
+            }
+        }
+
+
+        
+        private RelayCommand _openFileDialogCommand;
+
+        public RelayCommand OpenFileDialog
+        {
+            get
+            {
+                return _openFileDialogCommand
+                    ?? (_openFileDialogCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              var message =
+                                                  new NotificationMessageAction<string>(
+                                                      MessengerMessage.OPEN_FILE_DIALOG_FORM, GetImageSourse);
+                                              Messenger.Default.Send(message);
+                                          }));
+            }
+        }
+
+        private void GetImageSourse(string path)
+        {
+            Image = File.ReadAllBytes(path);
+
+            Dictionary<Color,double> colorDic =  AForgeUtil.ImageQuantizerByte(Image, 3);
+            Colors = new ObservableCollection<PColorModel>( ColorUtil.DictionaryToKnownPColorList(colorDic));
+        }
+
+
+
+        private RelayCommand _saveImageCommand;
+
+        public RelayCommand SaveImage
+        {
+            get
+            {
+                return _saveImageCommand
+                    ?? (_saveImageCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              FNHHelper.CreateImage(Image, null, Name);
+                                              Messenger.Default.Send<NotificationMessage<bool>>(new NotificationMessage<bool>(true, MessengerMessage.CLOSE_ADD_PHOTO_FORM));
+                                          },
+                                          () => (_imageBytes!=null && _imageBytes.Length!=0)));
             }
         }
     }

@@ -37,5 +37,19 @@ namespace MVVMPhotoApp.Extention
             return res;
         }
 
+        public static List<PColor> ToEntity(this IEnumerable<PColorModel> colorModels)
+        {
+            List<PColor> res = new List<PColor>();
+
+            if (colorModels != null)
+            {
+                var images = colorModels.Select(o => (PColor)o);
+
+                res.AddRange(images);
+            }
+
+            return res;
+        }
+
     }
 }

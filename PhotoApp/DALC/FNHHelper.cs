@@ -34,7 +34,15 @@ namespace DALC
                     {
                         if (_sessionFactory == null)
                         {
-                            var str = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+                            string str;
+                            try
+                            {
+                                str = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
+                            }
+                            catch
+                            {
+                                str = @"Data Source=D:\Git\Projects\PhotoApp\PhotoApp\DALC\DB\PhotoDataBase.sdf";
+                            }
 
                             var dbConfig = MsSqlCeConfiguration.Standard
                                 .ConnectionString(str)
@@ -139,7 +147,12 @@ namespace DALC
         #region Image
         public static void CreateImage(byte[] img, byte[] thambnail, string name)
         {
-            Create<Image>(new Image(img, thambnail, name));
+            Create<Image>(new Image(img, thambnail, name,null));
+        }
+
+        public static void CreateImage(byte[] img, byte[] thambnail, string name, IList<PColor> colors )
+        {
+            Create<Image>(new Image(img, thambnail, name,colors));
         }
 
         public static List<Image> SelectAllImages()

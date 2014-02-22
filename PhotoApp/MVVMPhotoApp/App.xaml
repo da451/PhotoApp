@@ -15,6 +15,8 @@
         <c:ItemConverter x:Key="ItemConverter"></c:ItemConverter>
         <c:ImageConverter x:Key="ImageConverter"></c:ImageConverter>
         <c:PColorConverter x:Key="ColorConverter"></c:PColorConverter>
+        <c:ValueConverter x:Key="ValueConverter"></c:ValueConverter>
+        <c:WidthValueConverter x:Key="WidthValueConverter"></c:WidthValueConverter>
     </Application.Resources>
     
 </Application>

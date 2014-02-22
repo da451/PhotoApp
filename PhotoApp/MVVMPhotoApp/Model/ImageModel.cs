@@ -1,8 +1,12 @@
-﻿using System.Windows.Input;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Input;
 using DALC;
 using DALC.Entities;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using MVVMPhotoApp.Extention;
 using PhotoApp;
 
 namespace MVVMPhotoApp.Model
@@ -128,6 +132,38 @@ namespace MVVMPhotoApp.Model
             }
         }
 
+
+        /// <summary>
+        /// The <see cref="ImageColors" /> property's name.
+        /// </summary>
+        public const string ImageColorsPropertyName = "ImageColors";
+
+        private ObservableCollection<PColorModel> _imageColors;
+
+        /// <summary>
+        /// Sets and gets the ImageColors property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public ObservableCollection<PColorModel> ImageColors
+        {
+            get
+            {
+                return _imageColors;
+            }
+
+            set
+            {
+                if (_imageColors == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(ImageColorsPropertyName);
+                _imageColors = value;
+                RaisePropertyChanged(ImageColorsPropertyName);
+            }
+        }
+
         public static explicit operator Image(ImageModel image)
         {
             byte[] imgBytes = new byte[image.Img.Length];
@@ -138,7 +174,7 @@ namespace MVVMPhotoApp.Model
 
             image.Thumbnail.CopyTo(tmbBytes, 0);
 
-            return new Image(image.ImageID, imgBytes, tmbBytes, image.Name);
+            return new Image(image.ImageID, imgBytes, tmbBytes, image.Name, image.ImageColors.ToEntity());
         }
     }
 }

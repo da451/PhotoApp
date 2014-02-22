@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -100,6 +101,69 @@ namespace MVVMPhotoApp.Utils
             return  res;
         }
 
+        public static Dictionary<Color, double> ImageQuantizerByte(byte[] image, int colorCount)
+        {
+            ImageConverter ic = new ImageConverter();
+
+            ColorImageQuantizer ciq = new ColorImageQuantizer(new MedianCutQuantizer());
+
+            Bitmap reducedImage = ciq.ReduceColors(new Bitmap((Image)ic.ConvertFrom(image)), _paletteColorCount);
+
+            Rectangle rect = new Rectangle(0, 0, reducedImage.Width, reducedImage.Height);
+
+            BitmapData bmpData = reducedImage.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+            IntPtr ptr = bmpData.Scan0;
+
+            int bytes = bmpData.Stride * reducedImage.Height;
+
+            byte[] rgbValues = new byte[bytes];
+
+            Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+            Dictionary<Color, int> pixelsCount = new Dictionary<Color, int>();
+
+            int stride = bmpData.Stride;
+
+            object syncRoot = new object();
+            Parallel.For(0, bmpData.Height, column =>
+            {
+                for (int row = 0; row < bmpData.Width; row++)
+                {
+                    byte blue = (byte) (rgbValues[(column*stride) + (row*3)]);
+
+                    byte green = (byte) (rgbValues[(column*stride) + (row*3) + 1]);
+
+                    byte red = (byte) (rgbValues[(column*stride) + (row*3) + 2]);
+
+                    Color c = Color.FromRgb(red, green, blue);
+                    lock (syncRoot)
+                    {
+                        if (!pixelsCount.ContainsKey(c))
+                        {
+                            pixelsCount.Add(c, 1);
+                        }
+                        else
+                        {
+                            pixelsCount[c]++;
+                        }
+                    }
+                    
+                }
+
+            });
+            
+            var topColors = pixelsCount.OrderByDescending(o => o.Value)
+                .Take(colorCount)
+                .ToDictionary(k => k.Key, v => v.Value);
+
+            int sum = topColors.Sum(o => o.Value);
+
+            var res = topColors.ToDictionary(k => k.Key, v => (v.Value*100.0)/sum);
+            //786432
+            //
+            return res;
+        }
 
         public static IList<Color> GetImagePalette(BitmapImage image)
         {

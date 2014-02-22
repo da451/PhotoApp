@@ -19,6 +19,11 @@ namespace DALC.Mappings
             Map(x => x.Name).Column("NAME");
 
             Map(x => x.Value).Column("VALUE");
+
+            //HasManyToMany(x => x.Images).
+            //    Table("[IMAGE.PCOLORS]").
+            //    ParentKeyColumn("IMAGE_ID").
+            //    ChildKeyColumn("COLOR_ID");
         }
     }
 }

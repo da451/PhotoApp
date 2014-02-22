@@ -3,17 +3,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:p ="clr-namespace:MVVMPhotoApp.ViewModel"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        Title="Add Photo Form" Height="330" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="Add Photo Form" Height="360" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <p:AddPhotoViewModel x:Key="photoVM"/>
     </Window.Resources>
     <Grid DataContext="{StaticResource photoVM}" >
         <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
             <RowDefinition/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        <Image Grid.Row="0" Source="{Binding Path=Image, Converter={StaticResource ImageConverter}, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding Path=Colors[0].Percent, Converter={StaticResource WidthValueConverter}}"></ColumnDefinition>
+                <ColumnDefinition Width="{Binding Path=Colors[1].Percent, Converter={StaticResource WidthValueConverter}}"></ColumnDefinition>
+                <ColumnDefinition Width="{Binding Path=Colors[2].Percent, Converter={StaticResource WidthValueConverter}}"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding Path=Colors[0].Value, Converter={StaticResource ItemConverter}}"/>
+            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding Path=Colors[1].Value, Converter={StaticResource ItemConverter}}"/>
+            <Label Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding Path=Colors[2].Value, Converter={StaticResource ItemConverter}}"/> 
+        </Grid>
+        <Image Grid.Row="1" Source="{Binding Path=Image, Converter={StaticResource ImageConverter}, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>

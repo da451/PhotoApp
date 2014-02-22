@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DALC.Entities;
 using GalaSoft.MvvmLight;
 
 namespace MVVMPhotoApp.Model
@@ -23,6 +24,13 @@ namespace MVVMPhotoApp.Model
         {
             _value = value;
             _name = name;
+        }
+
+        public PColorModel(string value, string name, double persent)
+        {
+            Value = value;
+            Name = name;
+            Percent = persent;
         }
 
 
@@ -82,7 +90,6 @@ namespace MVVMPhotoApp.Model
 
         private string _name;
 
-
         public string Name
         {
             get
@@ -101,6 +108,46 @@ namespace MVVMPhotoApp.Model
                 _name = value;
                 RaisePropertyChanged(NamePropertyName);
             }
+        }
+
+
+
+        /// <summary>
+        /// The <see cref="Percent" /> property's name.
+        /// </summary>
+        public const string PercentPropertyName = "Percent";
+
+        private double _percent;
+
+        /// <summary>
+        /// Sets and gets the Percent property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public double Percent
+        {
+            get
+            {
+                return _percent;
+            }
+
+            set
+            {
+                if (_percent == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(PercentPropertyName);
+                _percent = value;
+                RaisePropertyChanged(PercentPropertyName);
+            }
+        }
+
+
+        public static explicit operator PColor(PColorModel pcolor)
+        {
+
+            return new PColor(pcolor.ColorID, pcolor.Value, pcolor.Name);
         }
     }
 }

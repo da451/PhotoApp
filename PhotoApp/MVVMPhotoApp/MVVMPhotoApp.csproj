@@ -110,9 +110,12 @@
     <Compile Include="Converter\PColorConverter.cs" />
     <Compile Include="Converter\ImageConverter.cs" />
     <Compile Include="Converter\ItemConverter.cs" />
+    <Compile Include="Converter\ValueConverter.cs" />
+    <Compile Include="Converter\WidthValueConverter.cs" />
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="Extention\CollectionOfEntityExtensions.cs" />
     <Compile Include="Extention\CollectionOfModelExtensions.cs" />
+    <Compile Include="Extention\PColorExtensions.cs" />
     <Compile Include="Extention\DColor.cs" />
     <Compile Include="Extention\ImageExtensions.cs" />
     <Compile Include="Model\DataItem.cs" />
