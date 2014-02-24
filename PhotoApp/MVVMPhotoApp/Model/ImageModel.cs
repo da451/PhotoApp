@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using DALC;
 using DALC.Entities;
 using GalaSoft.MvvmLight;
@@ -37,6 +38,8 @@ namespace MVVMPhotoApp.Model
 
         }
 
+        
+        
         public const string ImageIDPropertyName = "ImageID";
 
         private int _imageID;
@@ -61,9 +64,12 @@ namespace MVVMPhotoApp.Model
             }
         }
 
+        
+        
         public const string ImgPropertyName = "Img";
 
         private byte[] _img;
+
         public byte[] Img
         {
             get
@@ -84,6 +90,8 @@ namespace MVVMPhotoApp.Model
             }
         }
 
+        
+        
         public const string ThumbnailPropertyName = "Thumbnail";
 
         private byte[] _thumbnail;
@@ -108,6 +116,8 @@ namespace MVVMPhotoApp.Model
             }
         }
 
+        
+        
         public const string NamePropertyName = "Name";
 
         private string _name;
@@ -134,16 +144,41 @@ namespace MVVMPhotoApp.Model
 
 
         /// <summary>
-        /// The <see cref="ImageColors" /> property's name.
+        /// The <see cref="ImageBitmap" /> property's name.
         /// </summary>
+        public const string ImageBitmapPropertyName = "ImageBitmap";
+
+        private BitmapImage _imageBitmap;
+
+        /// <summary>
+        /// Sets and gets the ImageBitmap property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public BitmapImage ImageBitmap
+        {
+            get
+            {
+                return _imageBitmap;
+            }
+
+            set
+            {
+                if (_imageBitmap == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(ImageBitmapPropertyName);
+                _imageBitmap = value;
+                RaisePropertyChanged(ImageBitmapPropertyName);
+            }
+        }
+
+
         public const string ImageColorsPropertyName = "ImageColors";
 
         private ObservableCollection<PColorModel> _imageColors;
 
-        /// <summary>
-        /// Sets and gets the ImageColors property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
         public ObservableCollection<PColorModel> ImageColors
         {
             get
@@ -164,6 +199,8 @@ namespace MVVMPhotoApp.Model
             }
         }
 
+        
+        
         public static explicit operator Image(ImageModel image)
         {
             byte[] imgBytes = new byte[image.Img.Length];

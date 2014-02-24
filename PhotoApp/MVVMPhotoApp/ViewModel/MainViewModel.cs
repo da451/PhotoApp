@@ -39,32 +39,6 @@ namespace MVVMPhotoApp.ViewModel
 
         private readonly object syncRoot = new object();
 
-        
-        public const string TimePropertyName = "Time";
-
-        private string _time;
-
-        public string Time
-        {
-            get
-            {
-                return _time;
-            }
-
-            set
-            {
-                if (_time == value)
-                {
-                    return;
-                }
-
-                RaisePropertyChanging(TimePropertyName);
-                _time = value;
-                RaisePropertyChanged(TimePropertyName);
-            }
-        }
-
-
 
         #region ImageCollection
         public const string ImageCollectionPropertyName = "ImageCollection";
@@ -124,7 +98,7 @@ namespace MVVMPhotoApp.ViewModel
         #region SelectedImage
         public const string SelectedImagePropertyName = "SelectedImage";
 
-        private ImageModel _selectImageModel = null;
+        private ImageModel _selectImageModel = new ImageModel();
 
         public ImageModel SelectedImage
         {
@@ -140,7 +114,6 @@ namespace MVVMPhotoApp.ViewModel
                     return;
                 }
 
-                RaisePropertyChanging(SelectedImagePropertyName);
                 _selectImageModel = value;
                 RaisePropertyChanged(SelectedImagePropertyName);
             }
@@ -161,19 +134,26 @@ namespace MVVMPhotoApp.ViewModel
                            {
                                ImageModel[] imgModels = FNHHelper.SelectAllImages().ToModel().ToArray();
 
-                               BitmapImages = new ObservableCollection<BitmapImage>();
+                               //BitmapImages = new ObservableCollection<BitmapImage>();
+                               ImageCollection = new ObservableCollection<ImageModel>();
 
                                foreach (ImageModel imageModel in imgModels)
                                {
-                                   Task<BitmapImage> imageTask =
-                                       new Task<BitmapImage>(
-                                           (imgModel) => ImageUtils.BytesToImage(((ImageModel) imgModel).Img),
+                                   Task<ImageModel> imageTask =
+                                       new Task<ImageModel>(
+                                           (imgModel) =>
+                                           {
+                                               ImageModel img = (ImageModel) imgModel;
+                                               img.ImageBitmap =  ImageUtils.BytesToImage(img.Img);
+                                               return img;
+                                           },
                                            imageModel);
 
                                    imageTask.ContinueWith(task =>
                                    {
-                                       task.Result.Freeze();
-                                       BitmapImages.Add(task.Result);
+                                       task.Result.ImageBitmap.Freeze();
+                                       
+                                       ImageCollection.Add(task.Result);
 
                                    }, TaskScheduler.FromCurrentSynchronizationContext());
 

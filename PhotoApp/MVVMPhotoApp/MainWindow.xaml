@@ -23,8 +23,8 @@
             <RowDefinition Height="20"></RowDefinition>
         </Grid.RowDefinitions>
         <Label Content="{Binding Path=Time, Mode=TwoWay}"></Label>
-        <ListView  Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding Path=BitmapImages}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectedItem="{Binding Path=SelectedImage}">
+        <ListView  Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding Path=ImageCollection}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectedItem="{Binding Path=SelectedImage, Mode=TwoWay}">
             <ListView.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"></SolidColorBrush>
             </ListView.Resources>
@@ -36,7 +36,7 @@
             <ListView.ItemTemplate>
                     <DataTemplate>
                         <Border Name="ItemBorder" VerticalAlignment="Top"  Height="100" Width="100" BorderBrush="Black" BorderThickness="1" Margin="1"  >
-                            <Image Source="{Binding Path=.}" ></Image>
+                            <Image Source="{Binding Path=ImageBitmap}" ></Image>
                         </Border>
                         <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}, Mode=FindAncestor}, Path=IsSelected}" Value="True">
