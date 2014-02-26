@@ -128,26 +128,33 @@ namespace MVVMPhotoApp.Utils
             object syncRoot = new object();
             Parallel.For(0, bmpData.Height, column =>
             {
-                for (int row = 0; row < bmpData.Width; row++)
+                try
                 {
-                    byte blue = (byte) (rgbValues[(column*stride) + (row*3)]);
-
-                    byte green = (byte) (rgbValues[(column*stride) + (row*3) + 1]);
-
-                    byte red = (byte) (rgbValues[(column*stride) + (row*3) + 2]);
-
-                    Color c = Color.FromRgb(red, green, blue);
-                    lock (syncRoot)
+                    for (int row = 0; row < bmpData.Width; row++)
                     {
-                        if (!pixelsCount.ContainsKey(c))
+                        byte blue = (byte) (rgbValues[(column*stride) + (row*3)]);
+
+                        byte green = (byte) (rgbValues[(column*stride) + (row*3) + 1]);
+
+                        byte red = (byte) (rgbValues[(column*stride) + (row*3) + 2]);
+
+                        Color c = Color.FromRgb(red, green, blue);
+                        lock (syncRoot)
                         {
-                            pixelsCount.Add(c, 1);
+                            if (!pixelsCount.ContainsKey(c))
+                            {
+                                pixelsCount.Add(c, 1);
+                            }
+                            else
+                            {
+                                pixelsCount[c]++;
+                            }
                         }
-                        else
-                        {
-                            pixelsCount[c]++;
-                        }
+
                     }
+                }
+                catch
+                {
                     
                 }
 

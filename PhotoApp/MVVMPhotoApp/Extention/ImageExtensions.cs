@@ -33,12 +33,14 @@ namespace MVVMPhotoApp.Extention
 
                     image.Thumbnail.CopyTo(tmbBytes, 0);
                 }
+
                 res = new ImageModel()
                 {
                     ImageID = image.ImageID,
                     Img = imgBytes,
                     Thumbnail = tmbBytes,
-                    Name = image.Name
+                    Name = image.Name,
+                    ImageColors = image.Colors.ToModel()
                 };
             }
 

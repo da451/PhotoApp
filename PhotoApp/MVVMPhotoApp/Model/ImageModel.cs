@@ -5,6 +5,8 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using DALC;
 using DALC.Entities;
+using FluentNHibernate.Conventions;
+using FluentNHibernate.Conventions.AcceptanceCriteria;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using MVVMPhotoApp.Extention;
@@ -143,17 +145,11 @@ namespace MVVMPhotoApp.Model
         }
 
 
-        /// <summary>
-        /// The <see cref="ImageBitmap" /> property's name.
-        /// </summary>
+
         public const string ImageBitmapPropertyName = "ImageBitmap";
 
         private BitmapImage _imageBitmap;
 
-        /// <summary>
-        /// Sets and gets the ImageBitmap property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
         public BitmapImage ImageBitmap
         {
             get
@@ -173,6 +169,7 @@ namespace MVVMPhotoApp.Model
                 RaisePropertyChanged(ImageBitmapPropertyName);
             }
         }
+
 
 
         public const string ImageColorsPropertyName = "ImageColors";
@@ -196,11 +193,38 @@ namespace MVVMPhotoApp.Model
                 RaisePropertyChanging(ImageColorsPropertyName);
                 _imageColors = value;
                 RaisePropertyChanged(ImageColorsPropertyName);
+                IsLoaded = _imageColors.Any();
             }
         }
 
-        
-        
+
+
+        public const string IsLoadedPropertyName = "IsLoaded";
+
+        private bool _isLoaded = false;
+
+        public bool IsLoaded
+        {
+            get
+            {
+                return _isLoaded;
+            }
+
+            set
+            {
+                if (_isLoaded == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(IsLoadedPropertyName);
+                _isLoaded = value;
+                RaisePropertyChanged(IsLoadedPropertyName);
+            }
+        }
+
+
+
         public static explicit operator Image(ImageModel image)
         {
             byte[] imgBytes = new byte[image.Img.Length];

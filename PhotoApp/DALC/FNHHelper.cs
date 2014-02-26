@@ -25,6 +25,8 @@ namespace DALC
 
         private static readonly object m_syncRoot = new object();
 
+        private static ISession m_session = null;
+
         private static ISessionFactory _sessionFactory;
 
         public static ISessionFactory SessionFactory
@@ -73,7 +75,7 @@ namespace DALC
             schemaExport.Execute(false, true, false);
         }
 
-        public static ISession OpenSession()
+        private static ISession OpenSession()
         {
             return SessionFactory.OpenSession();
         }
@@ -87,21 +89,41 @@ namespace DALC
         #region Generics
         private static List<T> SelectAll<T>() where T : class
         {
-            ICriteria criteria = OpenSession().CreateCriteria<T>();
-            List<T> res = (List<T>)criteria.List<T>();
-            return res;
+
+            ISession sess = OpenSession();
+            try
+            {
+                ICriteria criteria = sess.CreateCriteria<T>();
+                List<T> res = (List<T>)criteria.SetCacheMode(CacheMode.Ignore).SetCacheable(false).List<T>();
+                return res;
+            }
+            finally
+            {
+                sess.Close();
+            }
         }
 
         private static T SelectByID<T>(string columnNameID, int id) where T : class
         {
-            ICriteria criteria = OpenSession().CreateCriteria<T>().Add(Restrictions.Eq(columnNameID, id));
-            T res = (T)criteria.List<T>().First();
-            return res;
+            ISession sess = OpenSession();
+
+            try
+            {
+                ICriteria criteria = sess.CreateCriteria<T>().SetCacheMode(CacheMode.Ignore)
+                    .SetCacheable(false).Add(Restrictions.Eq(columnNameID, id));
+
+                T res = (T)criteria.List<T>().First();
+                return res;
+            }
+            finally
+            {
+                sess.Close();
+            }
         }
 
         private static int Create<T>(T value)
         {
-            ISession sess = FNHHelper.OpenSession();
+            ISession sess = OpenSession();
             ITransaction tx = sess.BeginTransaction();
             int id=-1;
             try
@@ -123,18 +145,17 @@ namespace DALC
             return id;
         }
 
-        private static bool Update<T>(T value)
+        private static bool Update<T>(T value) where T : class 
         {
             int rowCount = 0;
-
-            ISession sess = FNHHelper.OpenSession();
+            ISession sess = OpenSession();
 
             ITransaction tx = sess.BeginTransaction(); ;
 
             try
             {
-                sess.Update(value);
-
+                sess.Merge<T>(value);
+                
                 tx.Commit();
             }
             catch (Exception e)
@@ -155,7 +176,7 @@ namespace DALC
         {
             int rowCount = 0;
 
-            ISession sess = FNHHelper.OpenSession();
+            ISession sess = OpenSession();
             
             ITransaction tx = sess.BeginTransaction(); ;
             

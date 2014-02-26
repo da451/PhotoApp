@@ -6,7 +6,7 @@
         xmlns:ignore="http://www.ignore.com"
         mc:Ignorable="d ignore"
         Height="600"
-        Width="800"
+        Width="680"
         Title="MVVM Light Application"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
     <Window.Resources>
@@ -24,7 +24,8 @@
         </Grid.RowDefinitions>
         <Label Content="{Binding Path=Time, Mode=TwoWay}"></Label>
         <ListView  Grid.Row="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding Path=ImageCollection}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectedItem="{Binding Path=SelectedImage, Mode=TwoWay}">
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectedItem="{Binding Path=SelectedImage, Mode=TwoWay}" 
+                  Padding="5,10">
             <ListView.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"></SolidColorBrush>
             </ListView.Resources>
@@ -35,12 +36,29 @@
             </ListView.ItemsPanel>
             <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border Name="ItemBorder" VerticalAlignment="Top"  Height="100" Width="100" BorderBrush="Black" BorderThickness="1" Margin="1"  >
-                            <Image Source="{Binding Path=ImageBitmap}" ></Image>
+                        <Border Name="ItemBorder" VerticalAlignment="Top"  Height="150" Width="150" BorderBrush="Black" BorderThickness="1" Margin="7 7 7 0"  >
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"></RowDefinition>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                <Rectangle Fill="{Binding Path=ImageColors[0].Value, Converter={StaticResource ColorConverter}}"></Rectangle>
+                                    <Rectangle Grid.Column="1" Fill="{Binding Path=ImageColors[1].Value, Converter={StaticResource ColorConverter}}"></Rectangle>
+                                <Rectangle Grid.Column="2" Fill="{Binding Path=ImageColors[2].Value, Converter={StaticResource ColorConverter}}"></Rectangle>
+                            </Grid>
+                            <Image Grid.Row="1" Source="{Binding Path=ImageBitmap}" ></Image>
+                            </Grid>
                         </Border>
                         <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}, Mode=FindAncestor}, Path=IsSelected}" Value="True">
-                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="Crimson"></Setter>
+                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="DarkRed"></Setter>
+                                <Setter TargetName="ItemBorder" Property="BorderThickness" Value="3"></Setter>
                                 <Setter TargetName="ItemBorder" Property="RenderTransformOrigin" Value="0.5, 0.5"/>
                                 <Setter TargetName="ItemBorder" Property="RenderTransform">
                                     <Setter.Value>
