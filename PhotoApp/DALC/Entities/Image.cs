@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using DALC.Interfaces;
 using FluentNHibernate.Utils;
 using NHibernate.Mapping;
 
 namespace DALC.Entities
 {
-    public class Image
+    public class Image : IEntity
     {
         public Image()
         {
@@ -39,6 +41,20 @@ namespace DALC.Entities
         public virtual string Name { get; set; }
 
         public virtual IList<PColor> Colors { get; set; }
+
+        public virtual int PrimaryKey
+        {
+            get
+            {
+                return ImageID;
+            }
+        }
+
+        public virtual void AddColor(PColor color)
+        {
+            if(!Colors.Any(o => o.ColorID == color.ColorID))
+                Colors.Add(color);
+        }
 
     }
 

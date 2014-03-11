@@ -67,9 +67,7 @@ namespace MVVMPhotoApp.ViewModel
         #endregion
 
 
-        /// <summary>
-        /// The <see cref="BitmapImages" /> property's name.
-        /// </summary>
+
         public const string BitmapImagesPropertyName = "BitmapImages";
 
         private ObservableCollection<BitmapImage> _bitmapImages;
@@ -201,7 +199,7 @@ namespace MVVMPhotoApp.ViewModel
                     ?? (_deleteImageCommand = new RelayCommand(
                                           () =>
                                           {
-                                              if (FNHHelper.DeleteImage(SelectedImage.ImageID))
+                                              if (SelectedImage.Delete())
                                               {
                                                   ImageCollection.Remove(SelectedImage);
                                               }

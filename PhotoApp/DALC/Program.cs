@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DALC.Entities;
+using DALC.Interfaces;
+using DALC.Repository;
 
 namespace DALC
 {
@@ -11,18 +13,42 @@ namespace DALC
     {
         public static void Main(string[] p)
         {
-            List<PColor> colors = FNHHelper.SelectAllPColors();
 
-            List<Image> images = FNHHelper.SelectAllImages();
 
-            colors.First();
+            var uow = new UnitOfWork();
 
-            Image s = images.First();
+            var colors = new RepositoryPColor(uow);
 
-            //Image i = new Image();
+            var c = colors.Select().ToList();
 
-            FNHHelper.CreateImage(s.Img, null, DateTime.Now.ToLongTimeString(), colors.OrderBy(o => o.ColorID).Take(3).ToList());
+            var images = new RepositoryImage(uow);
 
+            var i  = images.Get(143);
+
+            i.AddColor(c[3]);
+            
+            uow.Commit();
+
+            uow = new UnitOfWork();
+
+             images = new RepositoryImage(uow);
+
+            i = images.Get(143);
+
+            i.AddColor(c[4]);
+
+            uow.Commit();
+
+
+            uow = new UnitOfWork();
+
+            images = new RepositoryImage(uow);
+
+            i = images.Get(143);
+
+            i.Colors.Clear();
+
+            uow.Commit();
 
         }
     }

@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:MVVMPhotoApp.Controls"
         xmlns:ignore="http://www.ignore.com"
         mc:Ignorable="d ignore"
         Height="600"
@@ -48,10 +49,12 @@
                                         <ColumnDefinition></ColumnDefinition>
                                         <ColumnDefinition></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                <Rectangle Fill="{Binding Path=ImageColors[0].Value, Converter={StaticResource ColorConverter}}"></Rectangle>
+                                    <Rectangle Fill="{Binding Path=ImageColors[0].Value, Converter={StaticResource ColorConverter}}"></Rectangle>
                                     <Rectangle Grid.Column="1" Fill="{Binding Path=ImageColors[1].Value, Converter={StaticResource ColorConverter}}"></Rectangle>
-                                <Rectangle Grid.Column="2" Fill="{Binding Path=ImageColors[2].Value, Converter={StaticResource ColorConverter}}"></Rectangle>
+                                    <Rectangle Grid.Column="2" Fill="{Binding Path=ImageColors[2].Value, Converter={StaticResource ColorConverter}}"></Rectangle>
+                                    
                             </Grid>
+                            <controls:WaitingControl Grid.Row="0" Visibility="{Binding Path=IsLoaded, Converter={StaticResource VisibilityConverter}}"></controls:WaitingControl>
                             <Image Grid.Row="1" Source="{Binding Path=ImageBitmap}" ></Image>
                             </Grid>
                         </Border>

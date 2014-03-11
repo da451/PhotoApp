@@ -107,11 +107,15 @@
     <Compile Include="AddPhotoWindow.xaml.cs">
       <DependentUpon>AddPhotoWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\WaitingControl.xaml.cs">
+      <DependentUpon>WaitingControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converter\ColorConverter.cs" />
     <Compile Include="Converter\PColorConverter.cs" />
     <Compile Include="Converter\ImageConverter.cs" />
     <Compile Include="Converter\ItemConverter.cs" />
     <Compile Include="Converter\ValueConverter.cs" />
+    <Compile Include="Converter\VisibilityConverter.cs" />
     <Compile Include="Converter\WidthValueConverter.cs" />
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="Extention\CollectionOfEntityExtensions.cs" />
@@ -143,6 +147,10 @@
       <DependentUpon>WindowTest.xaml</DependentUpon>
     </Compile>
     <Page Include="AddPhotoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\WaitingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

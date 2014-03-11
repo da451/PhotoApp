@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DALC;
 using DALC.Entities;
@@ -10,7 +12,9 @@ using FluentNHibernate.Conventions.AcceptanceCriteria;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using MVVMPhotoApp.Extention;
+using MVVMPhotoApp.Utils;
 using PhotoApp;
+using PhotoApp.Utils;
 
 namespace MVVMPhotoApp.Model
 {
@@ -223,6 +227,33 @@ namespace MVVMPhotoApp.Model
             }
         }
 
+        #region Methods
+
+        public void Save()
+        {
+            this._imageID = FNHHelper.CreateImage(this.Img, null, Name);
+
+            Task taskFindDomainColors = new Task((model) =>
+            {
+                ImageModel imageModel = (ImageModel) model; //FNHHelper.SelectImagesByID((int)id).ToImageModel();
+
+                Dictionary<Color, double> colorDic = AForgeUtil.ImageQuantizerByte(imageModel.Img, 3);
+
+                imageModel.ImageColors = new ObservableCollection<PColorModel>(ColorUtil.DictionaryToKnownPColorList(colorDic));
+
+                FNHHelper.UpdateImage((DALC.Entities.Image)imageModel);
+
+            }, this);
+
+            taskFindDomainColors.Start();
+        }
+
+        public bool Delete()
+        {
+            return FNHHelper.DeleteImage(this.ImageID);
+        }
+
+        #endregion
 
 
         public static explicit operator Image(ImageModel image)

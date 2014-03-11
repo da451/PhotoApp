@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DALC.Interfaces;
 
 namespace DALC.Entities
 {
-    public class PColor
+    public class PColor : IEntity
     {
         public PColor()
         {
@@ -35,5 +36,13 @@ namespace DALC.Entities
         public virtual string Value { get; set; }
 
         public virtual IList<Image> Images { get; set; }
+
+        public virtual int PrimaryKey
+        {
+            get
+            {
+                return ColorID;
+            }
+        }
     }
 }

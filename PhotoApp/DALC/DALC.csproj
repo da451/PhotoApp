@@ -73,10 +73,19 @@
     <Compile Include="Entities\Image.cs" />
     <Compile Include="Entities\PColor.cs" />
     <Compile Include="FNHHelper.cs" />
+    <Compile Include="Interfaces\IEntity.cs" />
+    <Compile Include="Interfaces\IRepositoryPColor.cs" />
+    <Compile Include="Interfaces\IRepository.cs" />
+    <Compile Include="Interfaces\IRepositoryImage.cs" />
+    <Compile Include="Interfaces\IUnitOfWork.cs" />
     <Compile Include="Mappings\ImageMap.cs" />
     <Compile Include="Mappings\PColorMap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repository\RepositoryBase.cs" />
+    <Compile Include="Repository\RepositoryImage.cs" />
+    <Compile Include="Repository\RepositoryPColor.cs" />
+    <Compile Include="Repository\UnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -111,6 +120,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

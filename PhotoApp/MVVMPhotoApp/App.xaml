@@ -7,7 +7,7 @@
              xmlns:c ="clr-namespace:MVVMPhotoApp.Converter"
              StartupUri="MainWindow.xaml"
              mc:Ignorable="d">
-    
+
     <Application.Resources>
         <!--Global View Model Locator-->
         <vm:ViewModelLocator x:Key="Locator"
@@ -18,6 +18,7 @@
         <c:ValueConverter x:Key="ValueConverter"></c:ValueConverter>
         <c:WidthValueConverter x:Key="WidthValueConverter"></c:WidthValueConverter>
         <c:ColorConverter x:Key="ColorConverter"></c:ColorConverter>
+        <c:VisibilityConverter x:Key="VisibilityConverter"></c:VisibilityConverter>
     </Application.Resources>
-    
+
 </Application>
