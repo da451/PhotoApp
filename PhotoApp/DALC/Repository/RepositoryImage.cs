@@ -14,5 +14,13 @@ namespace DALC.Repository
         {
         }
 
+        public void Insert(byte[] img, string name)
+        {
+            Insert(new Image()
+            {
+                Img = img,
+                Name = name
+            });
+        }
     }
 }

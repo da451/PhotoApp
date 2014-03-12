@@ -35,13 +35,6 @@ namespace DALC.Repository
             BeginTransaction();
         }
 
-        public UnitOfWork()
-        {
-            _sessionFactory = FNHHelper.SessionFactory;
-            BeginTransaction();
-        }
-
-
         private void BeginTransaction()
         {
             Session = _sessionFactory.OpenSession();

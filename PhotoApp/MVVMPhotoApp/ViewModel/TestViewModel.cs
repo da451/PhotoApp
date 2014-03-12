@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using DALC;
 using DALC.Mapping;
+using DALC.Repository;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -32,7 +33,11 @@ namespace MVVMPhotoApp.ViewModel
     {
         public TestViewModel()
         {
-            _baseColors = FNHHelper.SelectAllPColors().ToModel().ToList();
+            ReadonlyRepositoryPColor repositoryPColor =
+                new ReadonlyRepositoryPColor();
+
+            _baseColors = repositoryPColor.Select().ToModel().ToList();
+
         }
 
         private readonly object syncRoot = new object();

@@ -13,5 +13,10 @@ namespace DALC.Repository
         public RepositoryPColor(IUnitOfWork uow) : base(uow)
         {
         }
+
+        public void Insert(string name, string value)
+        {
+            Insert(new PColor(value,name));
+        }
     }
 }

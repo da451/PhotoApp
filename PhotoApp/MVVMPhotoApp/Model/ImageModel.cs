@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DALC;
 using DALC.Entities;
+using DALC.Repository;
 using FluentNHibernate.Conventions;
 using FluentNHibernate.Conventions.AcceptanceCriteria;
 using GalaSoft.MvvmLight;
@@ -231,18 +233,34 @@ namespace MVVMPhotoApp.Model
 
         public void Save()
         {
-            this._imageID = FNHHelper.CreateImage(this.Img, null, Name);
+            RepositoryImage repositoryImage =
+                new RepositoryImage(FNHHelper.CreateUoW());
+
+            this._imageID = repositoryImage.Insert(new Image()
+            {
+                Img = this.Img,
+                Name = this.Name
+            });
+
+            repositoryImage.UnitOfWork.Commit();
+
 
             Task taskFindDomainColors = new Task((model) =>
             {
-                ImageModel imageModel = (ImageModel) model; //FNHHelper.SelectImagesByID((int)id).ToImageModel();
+
+                ImageModel imageModel = (ImageModel) model;
 
                 Dictionary<Color, double> colorDic = AForgeUtil.ImageQuantizerByte(imageModel.Img, 3);
 
-                imageModel.ImageColors = new ObservableCollection<PColorModel>(ColorUtil.DictionaryToKnownPColorList(colorDic));
+                imageModel.ImageColors =
+                    new ObservableCollection<PColorModel>(ColorUtil.DictionaryToKnownPColorList(colorDic));
 
-                FNHHelper.UpdateImage((DALC.Entities.Image)imageModel);
+                RepositoryImage repositoryImageForTask =
+                    new RepositoryImage(FNHHelper.CreateUoW());
 
+                repositoryImageForTask.Update((DALC.Entities.Image) imageModel);
+
+                repositoryImageForTask.UnitOfWork.Commit();
             }, this);
 
             taskFindDomainColors.Start();
@@ -250,7 +268,13 @@ namespace MVVMPhotoApp.Model
 
         public bool Delete()
         {
-            return FNHHelper.DeleteImage(this.ImageID);
+            RepositoryImage repositoryImage = new RepositoryImage(FNHHelper.CreateUoW());
+
+            repositoryImage.Delete((DALC.Entities.Image) this);
+
+            repositoryImage.UnitOfWork.Commit();
+
+            return true;
         }
 
         #endregion
@@ -260,11 +284,15 @@ namespace MVVMPhotoApp.Model
         {
             byte[] imgBytes = new byte[image.Img.Length];
 
-            byte[] tmbBytes = new byte[image.Thumbnail.Length];
+            byte[] tmbBytes = null;
 
             image.Img.CopyTo(imgBytes, 0);
 
-            image.Thumbnail.CopyTo(tmbBytes, 0);
+            if (image.Thumbnail != null)
+            {
+                tmbBytes = new byte[image.Thumbnail.Length];
+                image.Thumbnail.CopyTo(tmbBytes, 0);
+            }
 
             return new Image(image.ImageID, imgBytes, tmbBytes, image.Name, image.ImageColors.ToEntity());
         }

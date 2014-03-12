@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using DALC;
+using DALC.Entities;
+using DALC.Repository;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -130,9 +132,11 @@ namespace MVVMPhotoApp.ViewModel
                        ?? (_selectImages = new RelayCommand(
                            () =>
                            {
-                               ImageModel[] imgModels = FNHHelper.SelectAllImages().ToModel().ToArray();
+                               ReadonlyRepositoryImage repositoryImage = 
+                                   new ReadonlyRepositoryImage();
 
-                               //BitmapImages = new ObservableCollection<BitmapImage>();
+                               ImageModel[] imgModels = repositoryImage.Select().ToModel().ToArray();
+
                                ImageCollection = new ObservableCollection<ImageModel>();
 
                                foreach (ImageModel imageModel in imgModels)
@@ -232,12 +236,17 @@ namespace MVVMPhotoApp.ViewModel
 
         private void AddManyPhotoFormClosedNotification(List<string> paths)
         {
+            RepositoryImage repositoryImage = new RepositoryImage(FNHHelper.CreateUoW());
+
             foreach (string path in paths)
             {
-                FNHHelper.CreateImage(File.ReadAllBytes(path), null, "");
+                repositoryImage.Insert(File.ReadAllBytes(path), string.Empty);
 
                 ImageUtils.BitmapImageFromFile(path);
             }
+
+            repositoryImage.UnitOfWork.Commit();
+
             if (paths.Count != 0)
             {
                 SelectImages.Execute(null);

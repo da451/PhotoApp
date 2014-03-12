@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using DALC;
+using DALC.Repository;
 using MVVMPhotoApp.Extention;
 using MVVMPhotoApp.Model;
 
@@ -45,7 +46,10 @@ namespace PhotoApp.Utils
         {
             if (_knownColors == null)
             {
-                _knownColors = FNHHelper.SelectAllPColors().ToModel().ToList();
+                ReadonlyRepositoryPColor repositoryPColor =
+                    new ReadonlyRepositoryPColor();
+
+                _knownColors = repositoryPColor.Select().ToModel().ToList();
             }
 
             return _knownColors.OrderBy(o => DeltaRGB(o, color)).Select(o=> new PColorModel(o.ColorID,o.Value,o.Name){Percent = color.Percent}).First();

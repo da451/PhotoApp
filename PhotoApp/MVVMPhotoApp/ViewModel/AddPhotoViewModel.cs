@@ -208,22 +208,8 @@ namespace MVVMPhotoApp.ViewModel
                     ?? (_saveImageCommand = new RelayCommand(
                                           () =>
                                           {
-                                              int imageID = FNHHelper.CreateImage(Image, null, Name);
-
-                                              Task taskFindDomainColors = new Task(id =>
-                                              {
-                                                  ImageModel imageModel = FNHHelper.SelectImagesByID((int)id).ToImageModel();
-
-                                                  Dictionary<Color, double> colorDic = AForgeUtil.ImageQuantizerByte(imageModel.Img, 3);
-
-                                                  imageModel.ImageColors = new ObservableCollection<PColorModel>(ColorUtil.DictionaryToKnownPColorList(colorDic));
-
-                                                  FNHHelper.UpdateImage((DALC.Entities.Image)imageModel);
-
-                                              }, imageID);
-
-                                              taskFindDomainColors.Start();
-
+                                              new ImageModel(Image,null,Name).Save();
+ 
                                               Messenger.Default.Send<NotificationMessage<bool>>(new NotificationMessage<bool>(true, MessengerMessage.CLOSE_ADD_PHOTO_FORM));
                                           },
                                           () => (_imageBytes!=null && _imageBytes.Length!=0)));

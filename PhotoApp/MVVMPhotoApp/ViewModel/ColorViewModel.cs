@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Windows.Media;
 using AForge.Imaging.Filters;
 using DALC;
+using DALC.Entities;
+using DALC.Repository;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using MVVMPhotoApp.Extention;
@@ -17,7 +19,8 @@ namespace MVVMPhotoApp.ViewModel
         {
             if(this.IsInDesignMode)
                 return;
-            PColors = new ObservableCollection<PColorModel>(FNHHelper.SelectAllPColors().ToModel());
+
+            SelectCommand.Execute(null);
         }
 
         public const string PColorsPropertyName = "PColors";
@@ -80,7 +83,13 @@ namespace MVVMPhotoApp.ViewModel
                     ?? (_addItemCommand = new RelayCommand<PColorModel>(
                                           (color) =>
                                           {
-                                              FNHHelper.CreatePColor(color.Name,color.Value);
+                                              RepositoryPColor repositoryPColor =
+                                                  new RepositoryPColor(FNHHelper.CreateUoW());
+
+                                              repositoryPColor.Insert(color.Name, color.Value);
+
+                                              repositoryPColor.UnitOfWork.Commit();
+
                                               SelectCommand.Execute(null);
                                           }));
             }
@@ -94,14 +103,21 @@ namespace MVVMPhotoApp.ViewModel
             get
             {
                 return _deleteCommand
-                    ?? (_deleteCommand = new RelayCommand(
-                                          () =>
-                                          {
-                                              FNHHelper.DeletePColor(SelectedColorItem.ColorID);
-                                              PColors.Remove(SelectedColorItem);
-                                              SelectedColorItem = null;
-                                          },
-                                          () => SelectedColorItem != null));
+                       ?? (_deleteCommand = new RelayCommand(
+                           () =>
+                           {
+                               RepositoryPColor repositoryPColor =
+                                   new RepositoryPColor(FNHHelper.CreateUoW());
+
+                               repositoryPColor.Delete((PColor)SelectedColorItem);
+
+                               repositoryPColor.UnitOfWork.Commit();
+
+                               PColors.Remove(SelectedColorItem);
+
+                               SelectedColorItem = null;
+                           },
+                           () => SelectedColorItem != null));
             }
         }
 
@@ -116,7 +132,10 @@ namespace MVVMPhotoApp.ViewModel
                     ?? (_selectCommand = new RelayCommand(
                                           () =>
                                           {
-                                              PColors =  new ObservableCollection<PColorModel>(FNHHelper.SelectAllPColors().ToModel());
+                                              ReadonlyRepositoryPColor readonlyRepositoryPColor =
+                                                  new ReadonlyRepositoryPColor();
+
+                                              PColors =  new ObservableCollection<PColorModel>(readonlyRepositoryPColor.Select().ToModel());
                                           }));
             }
         }

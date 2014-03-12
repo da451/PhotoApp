@@ -15,7 +15,7 @@ namespace DALC
         {
 
 
-            var uow = new UnitOfWork();
+            var uow = FNHHelper.CreateUoW();
 
             var colors = new RepositoryPColor(uow);
 
@@ -23,15 +23,15 @@ namespace DALC
 
             var images = new RepositoryImage(uow);
 
-            var i  = images.Get(143);
+            var i = images.Get(143);
 
             i.AddColor(c[3]);
-            
+
             uow.Commit();
 
-            uow = new UnitOfWork();
+            uow = FNHHelper.CreateUoW();
 
-             images = new RepositoryImage(uow);
+            images = new RepositoryImage(uow);
 
             i = images.Get(143);
 
@@ -40,7 +40,7 @@ namespace DALC
             uow.Commit();
 
 
-            uow = new UnitOfWork();
+            uow = FNHHelper.CreateUoW();
 
             images = new RepositoryImage(uow);
 

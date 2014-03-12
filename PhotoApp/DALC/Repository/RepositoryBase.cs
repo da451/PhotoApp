@@ -9,7 +9,7 @@ using NHibernate.Linq;
 
 namespace DALC.Repository
 {
-    public class RepositoryBase<TEntity> : IRepository<TEntity> where TEntity: IEntity 
+    public class RepositoryBase<T> : IRepository<T> where T: IEntity 
     {
 
         protected ISession Session
@@ -32,35 +32,34 @@ namespace DALC.Repository
         }
 
 
-        public IQueryable<TEntity> Select()
+        public IQueryable<T> Select()
         {
-            return Session.Query<TEntity>();
+            return Session.Query<T>();
         }
 
-        public TEntity Get(int id)
+        public T Get(int id)
         {
-            return Session.Get<TEntity>(id);
+            return Session.Get<T>(id);
         }
 
-        public int Insert(TEntity entity)
+        public int Insert(T entity)
         {
             return Convert.ToInt32(Session.Save(entity));
         }
 
-        public void Update(TEntity entity)
+        public void Update(T entity)
         {
             Session.Update(entity);
         }
 
-        public void Delete(TEntity entity)
+        public void Delete(T entity)
         {
-            Session.Delete(Session.Get<TEntity>(entity.PrimaryKey));
+            Session.Delete(Session.Get<T>(entity.PrimaryKey));
         }
 
-
-        public TEntity Load(int id)
+        public T Load(int id)
         {
-            return Session.Load<TEntity>(id);
+            return Session.Load<T>(id);
 
         }
     }
