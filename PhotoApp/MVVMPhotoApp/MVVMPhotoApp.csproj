@@ -118,11 +118,13 @@
     <Compile Include="Converter\VisibilityConverter.cs" />
     <Compile Include="Converter\WidthValueConverter.cs" />
     <Compile Include="Design\DesignDataService.cs" />
+    <Compile Include="Enums\SelectCommandAction.cs" />
     <Compile Include="Extention\CollectionOfEntityExtensions.cs" />
     <Compile Include="Extention\CollectionOfModelExtensions.cs" />
     <Compile Include="Extention\PColorExtensions.cs" />
     <Compile Include="Extention\DColor.cs" />
     <Compile Include="Extention\ImageExtensions.cs" />
+    <Compile Include="Manager\ImageManager.cs" />
     <Compile Include="Model\DataItem.cs" />
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
@@ -215,6 +217,7 @@
       <Name>DALC</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy $(SolutionDir)\ThirdPartLibraries\*.dll $(TargetDir) /y</PreBuildEvent>

@@ -12,10 +12,13 @@ using DALC.Repository;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using MVVMPhotoApp.Enums;
 using MVVMPhotoApp.Extention;
+using MVVMPhotoApp.Manager;
 using MVVMPhotoApp.Model;
 using MVVMPhotoApp.Notifications;
 using MVVMPhotoApp.Utils;
+using Win32Interop.Enums;
 
 namespace MVVMPhotoApp.ViewModel
 {
@@ -122,6 +125,9 @@ namespace MVVMPhotoApp.ViewModel
         #endregion
 
         #region Command SelectImages
+
+        private bool _isFirstTime = true;
+
         private RelayCommand _selectImages;
 
         public RelayCommand SelectImages
@@ -130,39 +136,63 @@ namespace MVVMPhotoApp.ViewModel
             {
                 return _selectImages
                        ?? (_selectImages = new RelayCommand(
-                           () =>
-                           {
-                               ReadonlyRepositoryImage repositoryImage = 
-                                   new ReadonlyRepositoryImage();
-
-                               ImageModel[] imgModels = repositoryImage.Select().ToModel().ToArray();
-
-                               ImageCollection = new ObservableCollection<ImageModel>();
-
-                               foreach (ImageModel imageModel in imgModels)
-                               {
-                                   Task<ImageModel> imageTask =
-                                       new Task<ImageModel>(
-                                           (imgModel) =>
-                                           {
-                                               ImageModel img = (ImageModel) imgModel;
-                                               img.ImageBitmap =  ImageUtils.BytesToImage(img.Img);
-                                               return img;
-                                           },
-                                           imageModel);
-
-                                   imageTask.ContinueWith(task =>
-                                   {
-                                       task.Result.ImageBitmap.Freeze();
-                                       
-                                       ImageCollection.Add(task.Result);
-
-                                   }, TaskScheduler.FromCurrentSynchronizationContext());
-
-                                   imageTask.Start();
-                               }
-                           }));
+                           () => SelectImagesWithAction(_isFirstTime ?
+                               SelectCommandAction.SelectFirstTime : SelectCommandAction.Select)));
             }
+        }
+
+        private void SelectImagesWithAction(SelectCommandAction action)
+        {
+            ReadonlyRepositoryImage repositoryImage =
+                new ReadonlyRepositoryImage();
+
+            var imgModels = repositoryImage.Select().ToModel();
+
+            ImageCollection = new ObservableCollection<ImageModel>(imgModels);
+
+            foreach (ImageModel imageModel in ImageCollection)
+            {
+                Task<Tuple<ImageModel, BitmapImage>> imageTask =
+                    new Task<Tuple<ImageModel, BitmapImage>>(
+                        (imgModel) =>
+                        {
+                            ImageModel img = (ImageModel)imgModel;
+                            BitmapImage bitmapImage = ImageUtils.BytesToImage(img.Img);
+                            return new Tuple<ImageModel, BitmapImage>(img, bitmapImage);
+                        },
+                        imageModel);
+
+                imageTask.ContinueWith(task =>
+                {
+                    task.Result.Item2.Freeze();
+
+                    task.Result.Item1.ImageBitmap = task.Result.Item2;
+
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+
+                imageTask.Start();
+            }
+
+
+            new Task(() =>
+            {
+
+                switch (action)
+                {
+                    case SelectCommandAction.SelectFirstTime:
+                        ImageManager.Instance.FindColors(imgModels);
+                        _isFirstTime = false;
+                        break;
+                    case SelectCommandAction.Select:
+                    case SelectCommandAction.Add:
+                        ImageManager.Instance.FindColors(imgModels);
+                        _isFirstTime = false;
+                        break;
+                    case SelectCommandAction.AddMany:
+                        ImageManager.Instance.FindColors(imgModels);
+                        break;
+                }
+            }).Start();
         }
 
         #endregion
@@ -187,7 +217,7 @@ namespace MVVMPhotoApp.ViewModel
         {
             if (isAdded)
             {
-                SelectImages.Execute(null);
+                SelectImagesWithAction(SelectCommandAction.Add);
             }
         } 
         #endregion
@@ -216,9 +246,6 @@ namespace MVVMPhotoApp.ViewModel
         #region Command AddManyPhotos
         private RelayCommand _addManyCommand;
 
-        /// <summary>
-        /// Gets the AddMany.
-        /// </summary>
         public RelayCommand AddMany
         {
             get
@@ -236,20 +263,12 @@ namespace MVVMPhotoApp.ViewModel
 
         private void AddManyPhotoFormClosedNotification(List<string> paths)
         {
-            RepositoryImage repositoryImage = new RepositoryImage(FNHHelper.CreateUoW());
 
-            foreach (string path in paths)
-            {
-                repositoryImage.Insert(File.ReadAllBytes(path), string.Empty);
-
-                ImageUtils.BitmapImageFromFile(path);
-            }
-
-            repositoryImage.UnitOfWork.Commit();
+            ImageManager.Instance.SaveImages(paths);
 
             if (paths.Count != 0)
             {
-                SelectImages.Execute(null);
+                SelectImagesWithAction(SelectCommandAction.AddMany);
             }
         } 
         #endregion

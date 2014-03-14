@@ -7,7 +7,7 @@
         xmlns:ignore="http://www.ignore.com"
         mc:Ignorable="d ignore"
         Height="600"
-        Width="680"
+        Width="700"
         Title="MVVM Light Application"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
     <Window.Resources>

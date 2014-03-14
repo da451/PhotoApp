@@ -28,7 +28,7 @@ namespace DALC.Mapping
                 Table("[IMAGE.PCOLORS]").Not.LazyLoad().
                 ParentKeyColumn("IMAGE_ID").
                 ChildKeyColumn("COLOR_ID").
-                Cascade.All();
+                Cascade.SaveUpdate();
 
         }
     }

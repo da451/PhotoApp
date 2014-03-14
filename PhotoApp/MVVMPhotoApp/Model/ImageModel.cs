@@ -1,22 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows.Media;
+using System.Threading;
+using System.Timers;
 using System.Windows.Media.Imaging;
 using DALC;
 using DALC.Entities;
 using DALC.Repository;
-using FluentNHibernate.Conventions;
-using FluentNHibernate.Conventions.AcceptanceCriteria;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using MVVMPhotoApp.Extention;
-using MVVMPhotoApp.Utils;
-using PhotoApp;
-using PhotoApp.Utils;
+using MVVMPhotoApp.Manager;
+using Timer = System.Timers.Timer;
+
 
 namespace MVVMPhotoApp.Model
 {
@@ -244,26 +239,7 @@ namespace MVVMPhotoApp.Model
 
             repositoryImage.UnitOfWork.Commit();
 
-
-            Task taskFindDomainColors = new Task((model) =>
-            {
-
-                ImageModel imageModel = (ImageModel) model;
-
-                Dictionary<Color, double> colorDic = AForgeUtil.ImageQuantizerByte(imageModel.Img, 3);
-
-                imageModel.ImageColors =
-                    new ObservableCollection<PColorModel>(ColorUtil.DictionaryToKnownPColorList(colorDic));
-
-                RepositoryImage repositoryImageForTask =
-                    new RepositoryImage(FNHHelper.CreateUoW());
-
-                repositoryImageForTask.Update((DALC.Entities.Image) imageModel);
-
-                repositoryImageForTask.UnitOfWork.Commit();
-            }, this);
-
-            taskFindDomainColors.Start();
+            ImageManager.Instance.FindColors(this);
         }
 
         public bool Delete()
@@ -275,6 +251,38 @@ namespace MVVMPhotoApp.Model
             repositoryImage.UnitOfWork.Commit();
 
             return true;
+        }
+
+        private Timer _cheakTimer = null;
+
+        public void Cheak()
+        {
+            if (this.ImageID > 0 && !this.IsLoaded && _cheakTimer == null)
+            {
+                _cheakTimer = new Timer(3000);
+
+                _cheakTimer.Elapsed += CheakTimerOnElapsed;
+
+                _cheakTimer.Start();
+            }
+
+        }
+
+        private void CheakTimerOnElapsed(object sender, ElapsedEventArgs elapsedEventArgs)
+        {
+            ReadonlyRepositoryImage readonlyRepositoryImage =
+                new ReadonlyRepositoryImage();
+
+            Image img = readonlyRepositoryImage.Get(this.ImageID);
+
+            if (img.Colors != null && img.Colors.Count != 0)
+            {
+                this.ImageColors = img.Colors.ToModel();
+
+                _cheakTimer.Stop();
+
+                _cheakTimer = null;
+            }
         }
 
         #endregion
