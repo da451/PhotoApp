@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using AForge.Imaging;
 using DALC;
 using DALC.Repository;
 using MVVMPhotoApp.Model;
 using MVVMPhotoApp.Utils;
 using PhotoApp.Utils;
+using Color = System.Windows.Media.Color;
 using Image = DALC.Entities.Image;
 
 namespace MVVMPhotoApp.Manager
@@ -111,6 +113,14 @@ namespace MVVMPhotoApp.Manager
             }
 
             repositoryImage.UnitOfWork.Commit();
+        }
+
+
+        public PColorModel FindColor(BitmapImage img, Point position, Size size)
+        {
+            Dictionary<Color, double> colorDic = AForgeUtil.ImageQuantizerByte(ImageUtils.ImageToBytes(img), position, size, 1);
+
+            return ColorUtil.DictionaryToKnownPColorList(colorDic).First();
         }
     }
 }

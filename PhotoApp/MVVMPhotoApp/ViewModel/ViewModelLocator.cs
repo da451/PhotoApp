@@ -42,10 +42,13 @@ namespace MVVMPhotoApp.ViewModel
 
             SimpleIoc.Default.Register<MainViewModel>();
 
-            new Task(() =>
-            {
-                FNHHelper.CreateSession();
-            }).Start();
+            SimpleIoc.Default.Register<ImageSeparatorViewModel>();
+
+            //new Task(() =>
+            //{
+            //    FNHHelper.CreateSession();
+            //}).Start();
+            FNHHelper.CreateSession();
         }
 
         /// <summary>
@@ -62,6 +65,13 @@ namespace MVVMPhotoApp.ViewModel
             }
         }
 
+        public ImageSeparatorViewModel ImageSeparator
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<ImageSeparatorViewModel>();
+            }
+        }
         /// <summary>
         /// Cleans up all the resources.
         /// </summary>

@@ -129,18 +129,24 @@
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
     <Compile Include="Model\ImageModel.cs" />
+    <Compile Include="Model\ImagePieces.cs" />
     <Compile Include="Model\PColorModel.cs" />
+    <Compile Include="Model\Separator.cs" />
     <Compile Include="Notifications\MessengerMessage.cs" />
     <Compile Include="Utils\AForgeUtil.cs" />
     <Compile Include="Utils\ColorUtil.cs" />
     <Compile Include="Utils\ImageUtils.cs" />
     <Compile Include="ViewModel\AddPhotoViewModel.cs" />
     <Compile Include="ViewModel\ColorViewModel.cs" />
+    <Compile Include="ViewModel\ImageSeparatorViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\TestViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="View\ColorsView.xaml.cs">
       <DependentUpon>ColorsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ImageSeparatorView.xaml.cs">
+      <DependentUpon>ImageSeparatorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Window1.xaml.cs">
       <DependentUpon>Window1.xaml</DependentUpon>
@@ -173,6 +179,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\ColorsView.xaml">
+      <SubType>Form</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ImageSeparatorView.xaml">
       <SubType>Form</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -192,5 +192,21 @@ namespace MVVMPhotoApp.Utils
                 encoder.Save(fileStream);
             }
         }
+
+        public static Bitmap BytesToBitmap(byte[] bytes)
+        {
+            ImageConverter ic = new ImageConverter();
+
+            Image img = (Image)ic.ConvertFrom(bytes);
+
+            return new Bitmap(img);
+        }
+
+        public static byte[] BitmapToBytes(Bitmap bitmap)
+        {
+            ImageConverter converter = new ImageConverter();
+
+            return (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
+        }
     }
 }

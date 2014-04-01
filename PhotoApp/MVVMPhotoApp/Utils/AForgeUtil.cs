@@ -167,9 +167,32 @@ namespace MVVMPhotoApp.Utils
             int sum = topColors.Sum(o => o.Value);
 
             var res = topColors.ToDictionary(k => k.Key, v => (v.Value*100.0)/sum);
-            //786432
-            //
+
             return res;
+        }
+
+        public static Dictionary<Color, double> ImageQuantizerByte(byte[] image, Point position, Size size ,int colorCount)
+        {
+            Bitmap finalImage = new Bitmap(size.Width, size.Height);
+
+            System.Drawing.Rectangle cropRect = new System.Drawing.Rectangle(position,size);
+
+            using (Bitmap sourceImage = ImageUtils.BytesToBitmap(image))
+            {
+                using (Bitmap croppedImage = sourceImage.Clone(cropRect, sourceImage.PixelFormat))
+                {
+                    using (TextureBrush tb = new TextureBrush(croppedImage))
+                    {
+                        using (Graphics g = Graphics.FromImage(finalImage))
+                        {
+                            g.FillRectangle(tb, 0, 0,size.Width,size.Height);
+                        }
+                    }
+                }
+
+            }
+
+            return ImageQuantizerByte(ImageUtils.BitmapToBytes(finalImage), colorCount);
         }
 
         public static IList<Color> GetImagePalette(BitmapImage image)
